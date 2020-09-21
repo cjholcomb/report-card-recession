@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+
+{% endblock title %}
+
+{% block content %}
+<small>fips code: {{ fips }}</small>
+<h2>{{ title }}</h2>
+
+<h3>2020 Forecast</h3>
+{% if forecast >= 75 %}
+    <p style="color:navy">Likelihood of Recovery: <b>{{ forecast }}%</b>. </p>
+{% elif forecast >= 50 %}
+    <p style="color:darkgreen">Likelihood of Recovery:  <b>{{ forecast }}%</b>.</p>
+{% elif forecast >= 25 %}
+    <p style="color:darkgoldenrod">Likelihood of Recovery:  <b>{{ forecast }}%</b>. </p>
+{% else %}
+    <p style="color:darkred">Likelihood of Recovery:  <b>{{ forecast }}%</b>.</p>
+{% endif %}
+
+<h4>2001 Performance:</h4>
+{% if recov_2001 %}
+    <p style="color:navy">Job Growth: {{ growth_2001 }} Quarters in Decline: {{ decline_2001 }}</p>
+{% else %}
+    <p style="color:darkred">Job Growth: {{ growth_2001 }} Quarters in Decline: {{ decline_2001 }}</p>
+{% endif %}
+<img src="static/images/plot_2001.png" alt="plot_2001">
+
+<h4>2008 Performance:</h4>
+{% if recov_2008 %}
+    <p style="color:navy">Job Growth: {{ growth_2008 }} Quarters in Decline: {{ decline_2008 }}</p>
+{% else %}
+    <p style="color:darkred">Job Growth: {{ growth_2008 }} Quarters in Decline: {{ decline_2008 }}</p>
+{% endif %}
+<img src="static/images/plot_2008.png" alt="plot_2001">
+
+
+{% endblock content %}

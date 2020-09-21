@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Data
+{% endblock %}
+
+{% block content %}
+<h1>Data</h1>
+
+<p>The dataset is compiled from the  Bureau of Labor Statistics(BLS) Quarterly Census of Employment and Wages (QCEW). Two recessions worth of data are included. From 2000 - 2007 and 2007 - 2019. Both include a full year before the recession event (see below).</p>
+
+<h2>Defintions and Assumptions</h2>
+
+<h3>>Recession Events</h3>
+
+<p>Each recession in my training data set (2001, 2008) have a particular *event* which corresponds with a sudden drop in economic forecasts (9/11 and the stock market crash of 2008). While these events are not necessaily the beginnings of their corresponding reccesions,they do represent the largest, steepest drops in employment. For the purposes of this project, the recession will be defined as beginning at these events.</p>
+
+<h3>Nadir</h3>
+
+<p>This is defined as the point at which an areas job numbers reach their lowest point during the time period in question.</p> 
+
+<h3>Pre-Recession Peak</h3>
+
+<p>This is defined as the 'high point' of employment numbers *before* the nadir.</p>
+
+<!---
+<h3>Recovery Point</h3>
+
+<p>When an area achieves its job numbers equal or greater than its Pre-Recession Peak before the next recession.</p>
+--->
+
+<h3>Post-Recession Peak</h3>
+
+<p>The 'high point' of jobs numbers *after* the nadir, but before the next recession event.</p>p
+
+<h2>Features</h2>
+
+<p>There are two types of features in the dataset. Dummy variables for the type of area in each row, and jobs in each industry</p>
+
+<h3>Dummy Variables</h3>
+<ul>
+    <li>State (includes Peurto Rico and U.S. Virgin Islands</li>
+    <li>City</li>
+    <li>Aggregated (Entire U.S., U.S. Cities, or U.S. Nonmetropolitcan Areas</li>
+</ul>
+
+<p>Area with non of the above designations are counties, but do not have a corresponding dummy variable.</p>
+
+<h3>Industry Features</h3>
+<p>Approximately 2400 indsutries are included. Column '10' indicates the total number of jobs in each area. All other features are proporational to the total number of jobs.</p>
+
+<h2>Targets</h2>
+
+<h3>Primary Target:Recovery (boolean)</h3>
+
+<p>Whether or not an area achieves a recovery point before the next recession.</p>
+
+<h3>Secondary Target:Job Growth</h3>
+
+<p> The difference between the pre-recession peak and the post recession peak</p>
+
+<h3>Tertiary Target: Decline Time</h3>
+
+<p>The number of quarters between the Pre-Recession Peak and the Nadir.</p>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block title %}
+            Report Card
+{% endblock title %}
+
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="">
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Search for a city, county, state, or territory</legend>
+                <div class="form-group">
+                    <form action="/" method="post">
+                        <input type="string" id="fips" name="fips">
+                        <input type="submit" value="Submit">
+                      </form>
+                </div>
+            </fieldset>
+                <div class="form-group"></div>
+        </form>
+    </div>
+{% endblock content %}

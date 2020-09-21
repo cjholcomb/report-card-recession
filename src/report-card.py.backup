@@ -1,0 +1,64 @@
+from flask import Flask, render_template, url_for, flash, redirect, request
+from classes import *
+
+# import sys
+# sys.path.append('../src')
+# sys.path.append('..')
+# print(sys.path)
+from dictionaries import *
+
+
+
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'any secret string'
+
+test = [
+    {'area_fips': '00001',
+    'area_name': 'Macon, Georgia',
+    'forecast': False
+    },
+
+     {'area_fips': '00002',
+    'area_name': 'Willimantic, Connecticut',
+    'forecast': True
+    }
+]
+
+@app.route('/')
+@app.route('/index')
+@app.route('/home')
+@app.route('/table-of-contents')
+@app.route('/contents')
+def hello():
+    return render_template('index.html', areas = test)
+
+@app.route('/overview')
+def overview():
+    return render_template('overview.html')
+
+@app.route('/lookup', methods = ['GET', 'POST'])
+def fips_search():
+if request.method
+
+    form = FipsLookup()
+    return render_template('lookup.html', title='Area Lookup')
+
+@app.route('/results', methods = ['GET', 'POST'])
+def results():
+    text = str(request.form['fips'])
+    return text
+
+# @app.route('/dataset')
+# @app.route('/data-dictionary')
+# @app.route('/exploratory-data-analysis')
+# @app.route('/model-tuning')
+# @app.route('/feature-importance')
+# @app.route('/predicted-outcomes')
+
+# @app.route('/industry-lookup')
+
+if __name__ == '__main__':
+    app.run(host = '0.0.0.0', debug = True)
+
+

@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content %}
+<div class="content-section">
+    <fieldset class="form-group"></fieldset>
+        <legend class="border-bottom mb-4">Search for a city, county, state, or territory
+            <div class="form-group">
+            <form action="/results" method="POST">
+                <input type="text" id="fips" name="fips">
+                <input type="submit" value="Submit">
+            </form>
+            </div>
+        </legend>
+    </fieldset>
+</div>
+{% endblock %}
