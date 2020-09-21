@@ -56,6 +56,10 @@ def _2001():
 def _2008():
     return render_template('2008.html')
 
+@app.route('/models')
+def models():
+    return render_template('models.html')
+
 @app.route('/lookup', methods = ['GET'])
 def fips_search():
     return render_template('lookup.html')
