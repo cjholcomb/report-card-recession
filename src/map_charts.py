@@ -12,7 +12,7 @@ df = pd.read_json("data/training_dataset.json",
 
 df['delta_scaled'] = df['delta'] /df['10']
 
-df_2020 = pd.read_json('data/prediction_2020.json', dtype={"area_fips": str})
+df_2020 = pd.read_json('data/prediction_2020.json')
 
 
 df_2001 = df[(df['year'] == 2001)]
@@ -26,7 +26,7 @@ import plotly.express as px
 
 def map_2001():
     fig = px.choropleth(df_2001, geojson = counties, locations='area_fips', color='delta_scaled', 
-                            color_continuous_scale="piyg",
+                            color_continuous_scale="Spectral",
                             color_continuous_midpoint=0,
                             range_color = (-1,1),
                             scope="usa",
@@ -39,6 +39,20 @@ def map_2001():
 
 def map_2008():
     fig = px.choropleth(df_2008, geojson = counties, locations='area_fips', color='delta_scaled', 
+                            color_continuous_scale="Spectral",
+                            color_continuous_midpoint=0,
+                            range_color = (-1,1),
+                            scope="usa",
+                            labels={'delta_scaled':'Job Growth'},
+                            title= '2008 Job Growth'
+                            )
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    # fig.suptitle('2001 Job Growth per capita')
+    fig.show()
+
+def map_2001_states():
+    df_states = pd.read_csv('data/for_statemap.csv')
+    fig = px.choropleth(df_states, locationmode='USA-states', locations='state', color='job_growth', 
                             color_continuous_scale="Spectral",
                             color_continuous_midpoint=0,
                             range_color = (-1,1),
