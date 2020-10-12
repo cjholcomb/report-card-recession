@@ -10,10 +10,6 @@ from wtforms.validators import DataRequired, Length
 import matplotlib.ticker as mtick
 
 
-class FipsLookup(FlaskForm):
-    fips = StringField('area_fips', validators = [DataRequired(), Length(min=5, max =5)])
-    
-
 class Area(object):
     fips = StringField('Enter your fips code:', validators=[DataRequired(), Length(min=5, max =5)])
     submit = SubmitField('Search')

@@ -16,6 +16,7 @@ def recovery_model():
     X = df.loc[:,features].values
     X_prime = df_2020.loc[:,features].values
     y_recovery = df.loc[:,['recovery']].values * 1
+    y_recovery = y_recovery.reshape(len(y_recovery,))
     y_delta = df.loc[:,['delta']].values * 1
     y_decline = df.loc[:,['decline']].values * 1    
     X_train, X_test, y_train, y_test = train_test_split(X, y_recovery, test_size=.2, stratify = y_recovery)
@@ -30,7 +31,7 @@ def recovery_model():
                         min_impurity_decrease=0.0, min_impurity_split=None,
                         min_samples_leaf=10, min_samples_split=2,
                         min_weight_fraction_leaf=0.0, n_estimators=100,
-                        n_jobs=None, oob_score=False, verbose=1,
+                        n_jobs=-1, oob_score=False, verbose=1,
                         warm_start=False)
     recovery_model.fit(X_train, y_train)
     recov_predict =  recovery_model.predict(X_prime)                    

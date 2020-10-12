@@ -48,13 +48,6 @@ def data():
 def eda():
     return render_template('EDA.html')
 
-@app.route('/2001')
-def _2001():
-    return render_template('2001.html')
-
-@app.route('/2008')
-def _2008():
-    return render_template('2008.html')
 
 @app.route('/models')
 def models():

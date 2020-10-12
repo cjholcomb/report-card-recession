@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Appendix
+{% endblock %}
+
+{% block content %}
+<title>Appendix</title>
+<h2>/src</h2>
+<h4>dictionaries.py</h4>
+<p>Contains long dictionaries and lists. Referenced in all other files.</p>
+<h4>helper_functions.py</h4>
+<p>Functions used in cleaning data and deriving target variables. Referenced in <i>produce_datasets.py</i>.</p>
+<h4>produce_datasets.py</h4>
+<p>Converts raw files from BLS to dataframes, exports to json files. Referenced in <i>forecast_dataframe.py</i>.</p>
+<h4>model_tester.py</h4>
+<p>Creates and tests models, both default and tuned, and produces charts. Referenced in forecast_dataframe</p>
+
+{% endblock %}

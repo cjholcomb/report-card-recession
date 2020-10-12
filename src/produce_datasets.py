@@ -217,13 +217,17 @@ def feature_space(year):
     
     #adds dummy variables for cities, states, and aggregated areas
     df = df.reset_index()
-    df['city'] = ('C' in df['area_fips']) * 1
-    df['state'] = ('000' in df['area_fips']) * 1
-    df['aggregated'] = ('US' in df['area_fips']) * 1
+    df['city'] = df['area_fips'].str.contains('C') * 1
+    df['state'] = df['area_fips'].apply(lambda x: 1 if x in state_abbr.keys() else 0)
+    df['aggregated'] = df['area_fips'].str.contains('US') * 1
     
     #fill nans
     df = df.fillna(0)
     
+    #adds area title to 2020 data
+    if year == '2020':
+        df['area_title'] = df['area_fips'].map(area_dict) 
+
     #reset the index to area_fips, the lookup variable
     df = df.set_index('area_fips')
     
@@ -234,6 +238,8 @@ def feature_space(year):
     for column in missing_columns:
         if column not in df.columns:
             df[column] = 0
+    
+
     
     #exports to json
     df.to_json(filepath)
