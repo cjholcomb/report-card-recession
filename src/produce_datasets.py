@@ -7,7 +7,9 @@ import numpy as np
 
 
 def create_timeline_2001(variable):
-    '''produces a dataframe of the 2001 recession timeline. Used to compute targets
+    '''produces a dataframe of the 2001 recession timeline.
+    
+    .0Used to compute targets
 
     params: variable, str, one of ['month3_emplvel' (employment), 'avg_wkly_wage' (wages)]
     returns: df, Dataframe

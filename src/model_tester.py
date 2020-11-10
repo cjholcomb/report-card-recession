@@ -40,7 +40,7 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import r2_score
 
-def train_split(arget):
+def train_split(target):
     '''
     Imports and splits the dataset according to designated target.
 
