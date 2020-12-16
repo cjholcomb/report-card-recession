@@ -1,4 +1,4 @@
-from src.dictionaries import *
+from dictionaries import *
 import pandas as pd
 import numpy as np 
 

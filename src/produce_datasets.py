@@ -1,5 +1,5 @@
-from src.dictionaries import *
-from src.helper_functions import *
+from dictionaries import *
+from helper_functions import *
 import pandas as pd
 import numpy as np
 
