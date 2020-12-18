@@ -115,7 +115,6 @@ def create_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
         savepath = "data/exported_dataframes/" + dimension + str(recession) + '_timeline.json'
         df.to_json(savepath)
 
-
     return df
 
 #produces the full feature set
