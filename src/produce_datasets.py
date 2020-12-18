@@ -1,64 +1,61 @@
-from dictionaries import *
-from helper_functions import *
+from src.dictionaries import *
+from src.helper_functions import *
 import pandas as pd
 import numpy as np
 
 #This file takes the quarterly raw data from the QCEW and turns them into quarterly timelines. From here, we can compute target variables.
 
 
-def create_timeline_2001(variable):
+def create_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 2001, save = False):
     '''produces a dataframe of the 2001 recession timeline.
     
     Used to compute targets
 
-    params: variable, str, one of ['month3_emplvel' (employment), 'avg_wkly_wage' (wages)]
+    params: 
+    variable- str, one of ['month3_emplvel' (employment), 'avg_wkly_wage' (wages)]
+    dimension- str, one of 'area' or 'industry'
+    recession- int, one of 2001 or 2008
+    save- boolean, determines if a json file will be generated
+    
     returns: df, Dataframe
     exports a json file (used in plotting results)
     '''
     
     #create a dataframe of the years in question
-    df = import_all(recession1_years)
+    if recession == 2001:
+        timeline = recession2001_years
+    elif recession == 2008:
+        timeline = recession2008_years
+    
+    df = import_all(timeline, dimension)
 
     #drop 'unknown or undefined' areas
-    df = df[~df['area_fips'].str.contains("999")]
+    if dimension == 'area':
+        df = df[~df['area_fips'].str.contains("999")]
+        index = ['area_fips', 'area_title']
+    elif dimension == 'industry':
+        index = ['industry_code', 'industry_title']
     
     #pivots the table to arrange quarters in columns, drops extraneous variables.
-    df = df.pivot_table(columns = 'qtrid', values = variable, index = ['area_fips', 'area_title'], aggfunc = np.sum)
+    df = df.pivot_table(columns = 'qtrid', values = variable, index = index, aggfunc = np.sum)
     df = df.reset_index()
     
     #fill nans
     df = df.fillna(0)
 
     #creates a secondary dataframe with only timeline variables
-    df2 = df.drop(columns = ['area_fips', 'area_title'])
+    df2 = df.drop(columns = index)
     df2 = df2.reset_index()
     
     #drops the index so that all calculations are free of any type mismatches
     df2 = df2.drop(columns = 'index')
     df2 = df2.fillna(0)
 
-
-### DEPRECIATED CODE #### 
-
-#     #this specifies when the jobs numbers "bottom-out" during the recession
-#     nadir = df2.iloc[:,6:].apply(lambda x: calc_nadir(x), axis=1).rename('nadir')
-    
-#     #counts the number of quarters to the nadir since the beginning of the timeframe
-#     nadir_qtr = df2.iloc[:,6:].apply(lambda x: calc_nadir_qtr(x), axis=1).rename('nadir_qtr')
-    
-#     #computes the highest points before and after the nadir, and captures the quarter count
-#     pre_peak = df2.apply(lambda x: calc_pre_peak(x), axis=1).rename('pre_peak')
-#     pre_peak_qtr = df2.apply(lambda x: calc_pre_peak_quarter(x), axis=1).rename('pre_peak_qtr')
-#     post_peak = df2.apply(lambda x: calc_post_peak(x), axis=1).rename('post_peak')
-#     post_peak_qtr = df2.apply(lambda x: calc_post_peak_qtr(x), axis=1).rename('post_peak_qtr')
-
-### DEPRECIATED CODE #### 
-    
     #specifies the lowest job numbers during the recession. Disregards quarters before the recession event. 
     df2['nadir'] = df2.iloc[:,6:].min(axis=1)
 
     #specifies which quarter the nadir occured.
-    df2['nadir_qtr'] = df2.iloc[:,6:].idxmin(axis=1).apply(lambda x: df.columns.get_loc(x))
+    df2['nadir_qtr'] = (df2.iloc[:,6:].idxmin(axis=1).apply(lambda x: df.columns.get_loc(x)))-2
     
     #creates a column to store indices for lookup.
     df2['new'] = [df2.iloc[i].values for i in df.index]
@@ -91,19 +88,22 @@ def create_timeline_2001(variable):
     #creates a column for the number or quarters until the results pass the pre-peak high, since the nadir
     df3['recovery_qtr'] = df3['recovery_list'].apply(lambda x: list(x).index(True))
 
+    #drops all redunant fields from the third dataframe
+    if recession == 2001:
+        dropcols = timeline2001_dropcols
+    elif recession == 2008:
+        dropcols = timeline2008_dropcols
+    df3 = df3.drop(columns = dropcols)
+
     #creates a new dataset to store derived fields
     df_new = df2[['nadir', 'nadir_qtr', 'pre_peak', 'pre_peak_qtr', 'post_peak', 'post_peak_qtr', 'recovery']]
-    
-    #adds the recovery quarter column
-    df_new = df_new.join(df3, join = left, rsuffix = '_recov')
+
+    #adds the recovery quarter column from the third dataframe
+    df_new = df_new.join(df3, how = 'left', rsuffix = '_recov')
 
     #puts the computed points in a dataframe, joins with timeline
     df = df.join(df_new, how = 'outer', rsuffix = '_derive')
     
-
-
-    
-
     #SECONDARY TARGET: How long did the jobs numbers decline?
     df['decline'] = (df['nadir_qtr'] - df['pre_peak_qtr'])
     
@@ -111,97 +111,11 @@ def create_timeline_2001(variable):
     df['delta'] = df['post_peak'] - df['pre_peak']
     
     #export the data
-    df.to_json('data/Recession1_timeline.json')
-    return df
-
-def create_timeline_2008(variable):
-    '''produces a dataframe of the 2008 recession timeline. Used to compute targets
-
-    params: variable, str, one of ['month3_emplvel' (employment), 'avg_wkly_wage' (wages)]
-    returns: df, Dataframe
-    exports a json file (used in plotting results)
-    '''
-    
-    #create a dataframe of the years in question
-    df = import_all(recession2_years)
-
-    #drop 'unknown or undefined' areas
-    df = df[~df['area_fips'].str.contains("999")]
-    
-    #pivots the table to arrange quarters in columns, drops extraneous variables.
-    df = df.pivot_table(columns = 'qtrid', values = variable, index = ['area_fips', 'area_title'], aggfunc = np.sum)
-    df = df.reset_index()
-    
-    #fill nans
-    df = df.fillna(0)
-
-    #creates a secondary dataframe with only timeline variables
-    df2 = df.drop(columns = ['area_fips', 'area_title'])
-    df2 = df2.reset_index()
-    
-    #drops the index so that all calculations are free of any type mismatches
-    df2 = df2.drop(columns = 'index')
-    df2 = df2.fillna(0)
+    if save:
+        savepath = "data/exported_dataframes/" + dimension + str(recession) + '_timeline.json'
+        df.to_json(savepath)
 
 
-### DEPRECIATED CODE #### 
-
-#     #this specifies when the jobs numbers "bottom-out" during the recession
-#     nadir = df2.iloc[:,6:].apply(lambda x: calc_nadir(x), axis=1).rename('nadir')
-    
-#     #counts the number of quarters to the nadir since the beginning of the timeframe
-#     nadir_qtr = df2.iloc[:,6:].apply(lambda x: calc_nadir_qtr(x), axis=1).rename('nadir_qtr')
-    
-#     #computes the highest points before and after the nadir, and captures the quarter count
-#     pre_peak = df2.apply(lambda x: calc_pre_peak(x), axis=1).rename('pre_peak')
-#     pre_peak_qtr = df2.apply(lambda x: calc_pre_peak_quarter(x), axis=1).rename('pre_peak_qtr')
-#     post_peak = df2.apply(lambda x: calc_post_peak(x), axis=1).rename('post_peak')
-#     post_peak_qtr = df2.apply(lambda x: calc_post_peak_qtr(x), axis=1).rename('post_peak_qtr')
-
-### DEPRECIATED CODE #### 
-    
-    #specifies the lowest job numbers during the recession. Disregards quarters before the recession event. 
-    df2['nadir'] = df2.iloc[:,6:].min(axis=1)
-
-    #specifies which quarter the nadir occured.
-    df2['nadir_qtr'] = df2.iloc[:,6:].idxmin(axis=1).apply(lambda x: df.columns.get_loc(x))
-    
-    #creates a column to store indices for lookup.
-    df2['new'] = [df2.iloc[i].values for i in df.index]
-    
-    #specifies the highest job numbers *before* the nadir.
-    df2['pre_peak'] = df2.apply(lambda x: max(x['new'][0:x['nadir_qtr']]), axis=1)
-    
-    #specifies the highest job numbers *after* the nadir
-    df2['post_peak'] = df2.apply(lambda x: max(x['new'][x['nadir_qtr']:]), axis=1)
-    
-    #specifies which quarter the pre-peak occurred.
-    df2['pre_peak_qtr'] = pd.Series([s[i] for i, s in zip(df2.index, df2['pre_peak'].apply(
-        lambda x: [i for i in (df2.iloc[:,0:-6] == x)
-                   .idxmax(axis=1)]))]).apply(lambda x: df2.columns.get_loc(x))
-    
-    #specifies which quarter the post-peak occurred.
-    df2['post_peak_qtr'] = pd.Series([s[i] for i, s in zip(df2.index, df2['post_peak'].apply(
-        lambda x: [i for i in (df2.iloc[:,0:-6] == x)
-                   .idxmax(axis=1)]))]).apply(lambda x: df2.columns.get_loc(x))
-    
-    #creates a new dataset to store derived fields
-    df_new = df2[['nadir', 'nadir_qtr', 'pre_peak', 'pre_peak_qtr', 'post_peak', 'post_peak_qtr']]
-    
-    #puts the computed points in a dataframe, joins with timeline
-    df = df.join(df_new, how = 'outer', rsuffix = '_derive')
-    
-    #PRIMARY TARGET: did the area decline the entire time(-1), did it start growing again but not avhieve it's former numbers(0), or did it grow and recover(1)?
-    df['recovery'] = (df['post_peak'] >= df['pre_peak']) *1
-
-    #SECONDARY TARGET: How long did the jobs numbers decline?
-    df['decline'] = (df['nadir_qtr'] - df['pre_peak_qtr'])
-    
-    #TERTIARY TARGET: different in before/after jobs numbers
-    df['delta'] = df['post_peak'] - df['pre_peak']
-    
-    #export the data
-    df.to_json('data/Recession2_timeline.json')
     return df
 
 #produces the full feature set
@@ -311,9 +225,9 @@ def create_training_dataset():
     return df_all, df_2001, df_2008
 
 
-if __name__ == '__main__':
-    df_train, df_2001, df_2008 = create_training_dataset()
-    df_predict = feature_space('2020')
+# if __name__ == '__main__':
+#     df_train, df_2001, df_2008 = create_training_dataset()
+#     df_predict = feature_space('2020')
 
 
  

@@ -17,13 +17,17 @@ def import_one(year, dimension = 'area'):
 
     params: year(str)
     returns: df(dataframe)'''
-    filepath = 'data/' + dimension + '_files' + str(year) + '.csv'
+    filepath = 'data/' + dimension + '_files/' + str(year) + '.csv'
     #all relevant csvs are renamed with only the year
     df = pd.read_csv(filepath, dtype = schema_dict)
     #schema_dict is found in dictionaries.py
     for column in drop_columns:
         if column in df.columns:
             df = df.drop([column], axis = 1)
+    if dimension == 'area':
+        df = df.drop(columns = ['industry_code', 'industry_title'])
+    elif dimension == 'industry':
+        df = df.drop(columns = ['area_fips', 'area_title'])
     return df
 
 def import_all(years, dimension = 'area'):
@@ -34,7 +38,11 @@ def import_all(years, dimension = 'area'):
     returns: df (dataframe)'''
     df = import_one(years[0], dimension)
     for year in years[1:]:
-        df = df.append(import_one(year), dimension)
+        df = df.append(import_one(year, dimension))
+    if dimension == 'industry':
+        df['industry_code'] = df['industry_code'].str.replace('31-33','31')
+        df['industry_code'] = df['industry_code'].str.replace('44-45','44')
+        df['industry_code'] = df['industry_code'].str.replace('48-49','48').astype('int32')
     df = add_qtrid(df)
     return df
 

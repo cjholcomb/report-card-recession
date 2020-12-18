@@ -3,6 +3,10 @@
 #list of years included in 2001 recession
 recession2001_years = [ '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007']
 
+timeline2001_dropcols = [2000.25, 2000.5, 2000.75, 2001.0, 2001.25, 2001.5, 2001.75, 2002.0, 2002.25, 2002.5, 2002.75, 2003.0, 2003.25,  2003.5, 2003.75, 2004.0, 2004.25, 2004.5, 2004.75, 2005.0, 2005.25, 2005.5, 2005.75, 2006.0, 2006.25, 2006.5, 2006.75, 2007.0, 2007.25, 2007.5, 2007.75, 2008.0, 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak','pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list']
+
+timeline2008_dropcols = [2007.25, 2007.5, 2007.75, 2008.0, 2008.25, 2008.5, 2008.75, 2009.0, 2009.25, 2009.5, 2009.75, 2010.0, 2010.25, 2010.5, 2010.75, 2011.0, 2011.25, 2011.5, 2011.75, 2012.0, 2012.25, 2012.5, 2012.75, 2013.0, 2013.25, 2013.5, 2013.75, 2014.0, 2014.25, 2014.5, 2014.75, 2015.0, 2015.25, 2015.5, 2015.75, 2016.0, 2016.25, 2016.5, 2016.75, 2017.0, 2017.25, 2017.5, 2017.75, 2018.0, 2018.25, 2018.5, 2018.75, 2019.0, 2019.25, 2019.5, 2019.75, 2020.0, 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak','pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list']
+
 #list of years included in 2007 recession
 recession2008_years = [ '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019']
 
@@ -87,7 +91,7 @@ quarters_2008 = {
 
 
 #columns to be removed from the original datasets
-drop_columns = ['industry_code',  'own_code',  'size_code',  'disclosure_code',  'industry_title',  'own_title',  'size_title',  'lq_disclosure_code',
+drop_columns = ['own_code',  'size_code',  'disclosure_code',  'own_title',  'size_title',  'lq_disclosure_code',
   'oty_disclosure_code',  'oty_month1_emplvl_chg',  'oty_month2_emplvl_chg',  'oty_month3_emplvl_chg',  'oty_total_qtrly_wages_chg',  'oty_taxable_qtrly_wages_chg',  'oty_qtrly_contributions_chg',  'oty_avg_wkly_wage_chg',  'lq_qtrly_estabs_count',  'lq_month1_emplvl',  'lq_month2_emplvl',  'lq_month3_emplvl',  'lq_total_qtrly_wages',  'lq_taxable_qtrly_wages',  'lq_qtrly_contributions',  'oty_qtrly_estabs_count_chg',  'oty_qtrly_estabs_count_pct_chg',  'oty_month1_emplvl_pct',  'oty_month2_emplvl_pct',  'oty_month3_emplvl_pct',  'oty_total_qtrly_wages_pct',  'oty_taxable_qtrly_wages_chg',  'oty_qtrly_contributions_pct',  'oty_avg_wkly_wage_pct',  'oty_taxable_qtrly_wages_chg.1',  'lq_avg_wkly_wage',  'taxable_qtrly_wages',  'qtrly_contributions']
 
 

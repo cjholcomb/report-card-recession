@@ -1,0 +1,105 @@
+### DEPRECIATED CODE #### - from produce_datasets.py
+
+#     #this specifies when the jobs numbers "bottom-out" during the recession
+#     nadir = df2.iloc[:,6:].apply(lambda x: calc_nadir(x), axis=1).rename('nadir')
+    
+#     #counts the number of quarters to the nadir since the beginning of the timeframe
+#     nadir_qtr = df2.iloc[:,6:].apply(lambda x: calc_nadir_qtr(x), axis=1).rename('nadir_qtr')
+    
+#     #computes the highest points before and after the nadir, and captures the quarter count
+#     pre_peak = df2.apply(lambda x: calc_pre_peak(x), axis=1).rename('pre_peak')
+#     pre_peak_qtr = df2.apply(lambda x: calc_pre_peak_quarter(x), axis=1).rename('pre_peak_qtr')
+#     post_peak = df2.apply(lambda x: calc_post_peak(x), axis=1).rename('post_peak')
+#     post_peak_qtr = df2.apply(lambda x: calc_post_peak_qtr(x), axis=1).rename('post_peak_qtr')
+
+### DEPRECIATED CODE #### 
+
+def create_timeline_2008(variable):
+    '''produces a dataframe of the 2008 recession timeline. Used to compute targets
+
+    params: variable, str, one of ['month3_emplvel' (employment), 'avg_wkly_wage' (wages)]
+    returns: df, Dataframe
+    exports a json file (used in plotting results)
+    '''
+    
+    #create a dataframe of the years in question
+    df = import_all(recession2_years)
+
+    #drop 'unknown or undefined' areas
+    df = df[~df['area_fips'].str.contains("999")]
+    
+    #pivots the table to arrange quarters in columns, drops extraneous variables.
+    df = df.pivot_table(columns = 'qtrid', values = variable, index = ['area_fips', 'area_title'], aggfunc = np.sum)
+    df = df.reset_index()
+    
+    #fill nans
+    df = df.fillna(0)
+
+    #creates a secondary dataframe with only timeline variables
+    df2 = df.drop(columns = ['area_fips', 'area_title'])
+    df2 = df2.reset_index()
+    
+    #drops the index so that all calculations are free of any type mismatches
+    df2 = df2.drop(columns = 'index')
+    df2 = df2.fillna(0)
+
+
+### DEPRECIATED CODE #### 
+
+#     #this specifies when the jobs numbers "bottom-out" during the recession
+#     nadir = df2.iloc[:,6:].apply(lambda x: calc_nadir(x), axis=1).rename('nadir')
+    
+#     #counts the number of quarters to the nadir since the beginning of the timeframe
+#     nadir_qtr = df2.iloc[:,6:].apply(lambda x: calc_nadir_qtr(x), axis=1).rename('nadir_qtr')
+    
+#     #computes the highest points before and after the nadir, and captures the quarter count
+#     pre_peak = df2.apply(lambda x: calc_pre_peak(x), axis=1).rename('pre_peak')
+#     pre_peak_qtr = df2.apply(lambda x: calc_pre_peak_quarter(x), axis=1).rename('pre_peak_qtr')
+#     post_peak = df2.apply(lambda x: calc_post_peak(x), axis=1).rename('post_peak')
+#     post_peak_qtr = df2.apply(lambda x: calc_post_peak_qtr(x), axis=1).rename('post_peak_qtr')
+
+### DEPRECIATED CODE #### 
+    
+    #specifies the lowest job numbers during the recession. Disregards quarters before the recession event. 
+    df2['nadir'] = df2.iloc[:,6:].min(axis=1)
+
+    #specifies which quarter the nadir occured.
+    df2['nadir_qtr'] = df2.iloc[:,6:].idxmin(axis=1).apply(lambda x: df.columns.get_loc(x))
+    
+    #creates a column to store indices for lookup.
+    df2['new'] = [df2.iloc[i].values for i in df.index]
+    
+    #specifies the highest job numbers *before* the nadir.
+    df2['pre_peak'] = df2.apply(lambda x: max(x['new'][0:x['nadir_qtr']]), axis=1)
+    
+    #specifies the highest job numbers *after* the nadir
+    df2['post_peak'] = df2.apply(lambda x: max(x['new'][x['nadir_qtr']:]), axis=1)
+    
+    #specifies which quarter the pre-peak occurred.
+    df2['pre_peak_qtr'] = pd.Series([s[i] for i, s in zip(df2.index, df2['pre_peak'].apply(
+        lambda x: [i for i in (df2.iloc[:,0:-6] == x)
+                   .idxmax(axis=1)]))]).apply(lambda x: df2.columns.get_loc(x))
+    
+    #specifies which quarter the post-peak occurred.
+    df2['post_peak_qtr'] = pd.Series([s[i] for i, s in zip(df2.index, df2['post_peak'].apply(
+        lambda x: [i for i in (df2.iloc[:,0:-6] == x)
+                   .idxmax(axis=1)]))]).apply(lambda x: df2.columns.get_loc(x))
+    
+    #creates a new dataset to store derived fields
+    df_new = df2[['nadir', 'nadir_qtr', 'pre_peak', 'pre_peak_qtr', 'post_peak', 'post_peak_qtr']]
+    
+    #puts the computed points in a dataframe, joins with timeline
+    df = df.join(df_new, how = 'outer', rsuffix = '_derive')
+    
+    #PRIMARY TARGET: did the area decline the entire time(-1), did it start growing again but not avhieve it's former numbers(0), or did it grow and recover(1)?
+    df['recovery'] = (df['post_peak'] >= df['pre_peak']) *1
+
+    #SECONDARY TARGET: How long did the jobs numbers decline?
+    df['decline'] = (df['nadir_qtr'] - df['pre_peak_qtr'])
+    
+    #TERTIARY TARGET: different in before/after jobs numbers
+    df['delta'] = df['post_peak'] - df['pre_peak']
+    
+    #export the data
+    df.to_json('data/Recession2_timeline.json')
+    return df
