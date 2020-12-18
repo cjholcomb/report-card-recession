@@ -1,10 +1,10 @@
 ###Used in produce_datasets.py###
 
 #list of years included in 2001 recession
-recession1_years = [ '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007']
+recession2001_years = [ '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007']
 
 #list of years included in 2007 recession
-recession2_years = [ '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019']
+recession2008_years = [ '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019']
 
 #Matches fips codes to state abbreviations- used to populate state level maps.
 state_abbr = {'01000':'AL', '02000':'AK', '04000':'AZ', '05000':'AR', '06000':'CA', '08000':'CO', '09000':'CT', '10000':'DE', '12000':'FL', '13000':'GA',

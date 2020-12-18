@@ -9,7 +9,7 @@ import numpy as np
 def create_timeline_2001(variable):
     '''produces a dataframe of the 2001 recession timeline.
     
-    .0Used to compute targets
+    Used to compute targets
 
     params: variable, str, one of ['month3_emplvel' (employment), 'avg_wkly_wage' (wages)]
     returns: df, Dataframe
@@ -78,15 +78,31 @@ def create_timeline_2001(variable):
     df2['post_peak_qtr'] = pd.Series([s[i] for i, s in zip(df2.index, df2['post_peak'].apply(
         lambda x: [i for i in (df2.iloc[:,0:-6] == x)
                    .idxmax(axis=1)]))]).apply(lambda x: df2.columns.get_loc(x))
+
+    #PRIMARY TARGET: did the area decline the entire time(-1), did it start growing again but not avhieve it's former numbers(0), or did it grow and recover(1)?
+    df2['recovery'] = (df2['post_peak'] >= df2['pre_peak']) *1
     
+    #create another dataframe to calculate the # of quarters to recover- only contains recovered datapoints
+    df3 = df2[df2['recovery'] == 1]
+    
+    #creates a column to derive the recovery quarter- list of boolean values
+    df3['recovery_list'] = df3.apply(lambda x: (x['new'][x['nadir_qtr']:] >= x['pre_peak']), axis=1)
+
+    #creates a column for the number or quarters until the results pass the pre-peak high, since the nadir
+    df3['recovery_qtr'] = df3['recovery_list'].apply(lambda x: list(x).index(True))
+
     #creates a new dataset to store derived fields
-    df_new = df2[['nadir', 'nadir_qtr', 'pre_peak', 'pre_peak_qtr', 'post_peak', 'post_peak_qtr']]
+    df_new = df2[['nadir', 'nadir_qtr', 'pre_peak', 'pre_peak_qtr', 'post_peak', 'post_peak_qtr', 'recovery']]
     
+    #adds the recovery quarter column
+    df_new = df_new.join(df3, join = left, rsuffix = '_recov')
+
     #puts the computed points in a dataframe, joins with timeline
     df = df.join(df_new, how = 'outer', rsuffix = '_derive')
     
-    #PRIMARY TARGET: did the area decline the entire time(-1), did it start growing again but not avhieve it's former numbers(0), or did it grow and recover(1)?
-    df['recovery'] = (df['post_peak'] >= df['pre_peak']) *1
+
+
+    
 
     #SECONDARY TARGET: How long did the jobs numbers decline?
     df['decline'] = (df['nadir_qtr'] - df['pre_peak_qtr'])

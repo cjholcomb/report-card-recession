@@ -11,13 +11,13 @@ def add_qtrid(df):
     df['qtrid'] = df['year'] + (df['qtr']/4)
     return df
 
-def import_one(year):
+def import_one(year, dimension = 'area'):
     '''brings a single year's woth of data into a dataframe. Used for initial EDA. 
     Referenced in import_all
 
     params: year(str)
     returns: df(dataframe)'''
-    filepath = 'data/' + str(year) + '.csv'
+    filepath = 'data/' + dimension + '_files' + str(year) + '.csv'
     #all relevant csvs are renamed with only the year
     df = pd.read_csv(filepath, dtype = schema_dict)
     #schema_dict is found in dictionaries.py
@@ -26,15 +26,15 @@ def import_one(year):
             df = df.drop([column], axis = 1)
     return df
 
-def import_all(years):
+def import_all(years, dimension = 'area'):
     '''combines as many years ofdata into a single dataframe, as well as adding quater id
     References import_one and add_qtrid
 
     params: years (list of str)
     returns: df (dataframe)'''
-    df = import_one(years[0])
+    df = import_one(years[0], dimension)
     for year in years[1:]:
-        df = df.append(import_one(year))
+        df = df.append(import_one(year), dimension)
     df = add_qtrid(df)
     return df
 
