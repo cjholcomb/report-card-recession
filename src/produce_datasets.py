@@ -12,7 +12,7 @@ def create_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
     Used to compute targets
 
     params: 
-    variable- str, one of ['month3_emplvel' (employment), 'avg_wkly_wage' (wages)]
+    variable- str, one of ['month3_emplvel' (employment), 'avg_wkly_wage' (wages), 'qtrly_estabs_count'(firms)]
     dimension- str, one of 'area' or 'industry'
     recession- int, one of 2001 or 2008
     save- boolean, determines if a json file will be generated
