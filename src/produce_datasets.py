@@ -1,5 +1,5 @@
-from src.dictionaries import *
-from src.helper_functions import *
+from timeline_dictionaries import *
+from helper_functions import *
 import pandas as pd
 import numpy as np
 
@@ -12,7 +12,7 @@ def create_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
     Used to compute targets
 
     params: 
-    variable- str, one of ['month3_emplvel' (employment), 'avg_wkly_wage' (wages), 'qtrly_estabs_count'(firms)]
+    variable- str, one of ['month3_emplvl' (employment), 'avg_wkly_wage' (wages), 'qtrly_estabs_count'(firms)]
     dimension- str, one of 'area' or 'industry'
     recession- int, one of 2001 or 2008
     save- boolean, determines if a json file will be generated
@@ -21,13 +21,13 @@ def create_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
     exports a json file (used in plotting results)
     '''
     
-    #create a dataframe of the years in question
-    if recession == 2001:
-        timeline = recession2001_years
-    elif recession == 2008:
-        timeline = recession2008_years
+    # #create a dataframe of the years in question
+    # if recession == 2001:
+    #     timeline = recession2001_years
+    # elif recession == 2008:
+    #     timeline = recession2008_years
     
-    df = import_all(timeline, dimension)
+    df = import_all(recessions_int[recession], dimension)
 
     #drop 'unknown or undefined' areas
     if dimension == 'area':
