@@ -124,6 +124,10 @@ def create_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
     
     #export the data
     if save:
+        # if dimension == 'industry':
+        #     df = df.set_index('industry_code')
+        # elif dimension == 'area':
+        #     df = df.set_index('area_fips')
         savepath = "data/timelines/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json"
         df.to_json(savepath)
 

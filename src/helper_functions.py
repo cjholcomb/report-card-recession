@@ -20,6 +20,9 @@ def import_one(year, dimension = 'area'):
     filepath = 'data/' + dimension + '_files/' + str(year) + '.csv'
     #all relevant csvs are renamed with only the year
     df = pd.read_csv(filepath, dtype = schema_dict)
+    if dimension == 'industry':
+        df = df[df.own_code != 8]
+        df = df[df.own_code != 9]
     #schema_dict is found in dictionaries.py
     for column in drop_columns:
         if column in df.columns:

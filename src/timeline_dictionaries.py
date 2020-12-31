@@ -13,9 +13,9 @@ recessions_int = {2001: [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007],
 2008: [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019],
 'full': [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020]}
 
-recession_events = {2001: 2001.75, 2008: 2008.75, 2020: 2020.25}
+recession_events = {2001: 2001.75, 2008: 2008.75, 2020: 2020.25, 'full': None}
 
-events_display = {2001: 'Sept 11', 2008: 'Financial Crash', 2020: 'COVID-19'}
+events_display = {2001: 'Sept 11', 2008: 'Financial Crash', 2020: 'COVID-19', 'full': None}
 
 end_columns =  {2001:33, 2008:53, 'full':82}
 
@@ -48,9 +48,9 @@ class Recession(object):
         self.years = recessions_int[year]
         self.event_year = year
         self.event_quarter = recession_events[year]
+        self.event_label = events_display[year]
         self.quarters = [quarter for quarter in quarters_display.keys() if quarter >= min(self.years) and quarter <= (max(self.years) + 1)]
         self.xaxis = [v for k,v in quarters_display.items() if k in self.quarters]
-        self.columns = {'start':, 'end'}
 
     def compute_timelines(self, variables = ['month3_emplvl', 'avg_wkly_wage', 'qtrly_estabs_count'], dimensions = ['area', 'industry']):
         if 'area' in dimensions:

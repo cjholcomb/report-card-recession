@@ -1,5 +1,6 @@
 #splits industry designations into "generations", dividing them by their layers. Used for feature importance.
-industry_generations = {0: [10], 1: [101, 102], 
+industry_generations = {0: [10], 
+1: [101, 102], 
 2: [1011, 1012, 1013, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029], 
 3: [11, 21, 22, 23, 31, 42, 44, 48, 51, 52, 53, 54, 55, 56, 61, 62, 71, 72, 81, 92, 99], 
 4: [111, 112, 113, 114, 115, 211, 212, 213, 221, 236, 237, 238, 311, 312, 313, 314, 315, 316, 321, 322, 323, 324, 325, 326, 327, 331, 332, 333, 334, 335, 336, 337, 339, 423, 424, 425, 441, 442, 443, 444, 445, 446, 447, 448, 451, 452, 453, 454, 481, 482, 483, 484, 485, 486, 487, 488, 491, 492, 493, 511, 512, 515, 516, 517, 518, 519, 521, 522, 523, 524, 525, 531, 532, 533, 541, 551, 561, 562, 611, 621, 622, 623, 624, 711, 712, 713, 721, 722, 811, 812, 813, 814, 921, 922, 923, 924, 925, 926, 927, 928, 999], 
@@ -67,8 +68,11 @@ class Industry(object):
     def __init__(self, code):
         self.code = code
         self.title = industry_titles[code]
-        self.generation = industry_generations[code]
-        self.parent = parent_industry[code]
+        self.generation = self.derive_generation(code)
+        if code == 10:
+            self.parent = None
+        else:
+            self.parent = parent_industry[code]
         if self.generation == 7:
             self.children = []
         else:
@@ -77,3 +81,23 @@ class Industry(object):
             self.siblings = []
         else:
             self.siblings = sibling_industries[code]
+
+    def derive_generation(self, code):
+        if code == 10:
+            return 0
+        elif code <= 99:
+            return 3
+        elif code <= 102:
+            return 1
+        elif code <= 999:
+            return 4
+        elif code <= 1029:
+            return 2
+        elif code <= 9999:
+            return 5
+        elif code <= 99999:
+            return 6
+        elif code <= 999999:
+            return 7 
+
+
