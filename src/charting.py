@@ -10,7 +10,7 @@ import numpy as np
 
 class Vector(object):
     
-    def __init__ (self, key, recession, dimension, variable, chart = False):
+    def __init__ (self, key, recession, dimension, variable, chart = False, style = 'darkgrid'):
         filepath =  "data/timelines/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json" 
         end = end_columns[recession]
         df = pd.read_json(filepath)
@@ -28,22 +28,24 @@ class Vector(object):
         self.y = df.loc[key][1:end]
         self.label = df[index_title].loc[key]
         self.nadir = df['nadir'].loc[key]
-        self.nadir_qtr = df['nadir_qtr'].loc[key]
+        self.nadir_qtr = df['nadir_qtr'].loc[key] / 4 + recession.years[0]
         self.pre_peak = df['pre_peak'].loc[key]
-        self.pre_peak_qtr = df['pre_peak_qtr'].loc[key]
+        self.pre_peak_qtr = df['pre_peak_qtr'].loc[key] / 4 + recession.years[0]
         self.post_peak = df['post_peak'].loc[key]
-        self.post_peak_qtr = df['post_peak_qtr'].loc[key]
-        self.recovery_time = df['recovery_qtr'].loc[key]
+        self.post_peak_qtr = df['post_peak_qtr'].loc[key] / 4 + recession.years[0]
+        self.recovery_qtr = (df['nadir_qtr'].loc[key] + df['recovery_qtr'].loc[key]) / 4 + recession.years[0]
         self.decline = df['decline'].loc[key]
         self.delta = df['delta'].loc[key]
         if chart:
-            fig, ax = plt.subplots(figsize = (len(self.x), 5))
+            fig, ax = plt.subplots(figsize = (15, 4))
             ax.plot(self.x,self.y, color = 'green', linewidth = 1, alpha = 0.8, label = self.label)
             self.ax = ax
-            ax.axhline(y = self.nadir, xmin = self.x[0], xmax = self.x[-1], color = 'red', linewidth = .5, alpha = 0.5, label = 'nadir: ' + str(self.nadir_qtr))
-            ax.axhline(y = self.pre_peak, xmin = self.x[0], xmax = self.x[-1], color = 'blue', linewidth = .5, alpha = .5, label = 'pre-recession-peak: ' + str(self.pre_peak_qtr))
-            ax.axvline(x = self.event_quarter, color = 'black', linewidth = 0.5, alpha = 0.5, label = self.event_label)
-            ax.axvline(x = self.recovery_time, color = 'black', linewidth = 0.5, alpha = 0.5, label = 'recovery: ' + str(self.recovery_time))
+            sns.set_style(style)
+            ax.axhline(y = self.nadir, xmin = self.x[0], xmax = self.x[-1], color = 'red', linewidth = .5, alpha = 0.5, label = 'nadir: ' + str(quarters_display[self.nadir_qtr]))
+            ax.axhline(y = self.pre_peak, xmin = self.x[0], xmax = self.x[-1], color = 'blue', linewidth = .5, alpha = .5, label = 'pre-recession-peak: ' + str(quarters_display[self.pre_peak_qtr]))
+            ax.axhline(y = self.post_peak, xmin = self.x[0], xmax = self.x[-1], color = 'blue', linewidth = .5, alpha = .5, label = 'post-recession-peak: ' + str(quarters_display[self.post_peak_qtr]))
+            ax.axvline(x = quarters_display[self.event_quarter], color = 'black', linewidth = 0.5, alpha = 0.5, label = self.event_label)
+            ax.axvline(x = quarters_display[self.recovery_qtr], color = 'purple', linewidth = 0.5, alpha = 0.5, label = 'recovery: ' + str(quarters_display[self.recovery_qtr]))
             ax.set_title(str(recession.event_year) + ' Recession')
             ax.tick_params(axis='both', which='major', labelsize=10)
             ax.tick_params(axis='both', which='minor', labelsize=10)

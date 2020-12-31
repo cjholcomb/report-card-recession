@@ -1,4 +1,4 @@
-###Used in produce_datasets.py###
+###Unused and depreciated lists and dictioanries###
 
 #list of years included in 2001 recession
 recession2001_years = [ '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007']
@@ -63,9 +63,7 @@ drop_columns = ['own_code',  'size_code',  'disclosure_code',  'own_title',  'si
 columns_list =  ['area_fips',  'own_code',  'industry_code',  'agglvl_code',  'size_code',  'year',  'qtr',  'disclosure_code',  'area_title',  'own_title',
   'industry_title',  'agglvl_title',  'size_title',  'qtrly_estabs',  'month1_emplvl',  'month2_emplvl',  'month3_emplvl',  'total_qtrly_wages',  'taxable_qtrly_wages',  'qtrly_contributions',  'avg_wkly_wage',  'lq_disclosure_code',  'lq_qtrly_estabs',  'lq_month1_emplvl',  'lq_month1_emplv2',  'lq_month1_emplv3',  'lq_total_qtrly_wages',  'lq_taxable_qtrly_wages',  'lq_qrtly_contributions',  'oty_disclosure_code',  'oty_qtrly_estabs',  'oty_qtrly_estabs_pct_chg',  'oty_month1_emplvl_chg',  'oty_month1_emplvl_pct_chg',  'oty_month2_emplv_chg',  'oty_month2_emplvl_pct_chg',  'oty_month3_emplvl_chg',  'oty_month3_emplvl_pct_chg',  'oty_total_qtrly_wages_chg',  'oty_total_qtrly_wages_pct_chg',  'oty_taxable_qtrly_wages_chg',  'oty_taxable_qtrly_wages_pct_chg',  'oty_qrtly_contributions_chg',  'oty_qrtly_contributions_pct_chg',  'oty_avg_wkly_wage_chg',  'oty_avg_wkly_wage_pct_chg']
 
-#schema for importing dataframe
-schema_dict = { 'area_fips':str,  'own_code':str,  'industry_code':str,  'agglvl_code':str,  'size_code':str,  'year':int,  'qtr':int,  'disclosure_code':str,
-  'area_title':str,  'own_title':str,  'industry_title':str,  'agglvl_title':str,  'size_title':str,  'qtrly_estabs':int,  'month1_emplvl':int,  'month2_emplvl':int,  'month3_emplvl':int,  'total_qtrly_wages':int,  'taxable_qtrly_wages':int,  'qtrly_contributions':int,  'avg_wkly_wage':int,  'lq_disclosure_code':str,  'lq_qtrly_estabs':float,  'lq_month1_emplvl':float,  'lq_month1_emplv2':float,  'lq_month1_emplv3':float,  'lq_total_qtrly_wages':float,  'lq_taxable_qtrly_wages':float,  'lq_qrtly_contributions':float,  'oty_disclosure_code':str,  'oty_qtrly_estabs':int,  'oty_qtrly_estabs_pct_chg':float,  'oty_month1_emplvl_chg':int,  'oty_month1_emplvl_pct_chg':float,  'oty_month2_emplv_chg':int,  'oty_month2_emplvl_pct_chg':float,  'oty_month3_emplvl_chg':int,  'oty_month3_emplvl_pct_chg':float,  'oty_total_qtrly_wages_chg':int,  'oty_total_qtrly_wages_pct_chg':float,  'oty_taxable_qtrly_wages_chg':int,  'oty_taxable_qtrly_wages_pct_chg':float,  'oty_qrtly_contributions_chg':int,  'oty_qrtly_contributions_pct_chg':float,  'oty_avg_wkly_wage_chg':int,  'oty_avg_wkly_wage_pct_chg':float}    
+   
 
 
   
