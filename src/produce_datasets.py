@@ -1,7 +1,16 @@
 from timeline_dictionaries import *
+from area_dictionaries import *
+from industry_dictionaries import * 
 from helper_functions import *
 import pandas as pd
 import numpy as np
+
+timeline2001_dropcols = [2000.25, 2000.5, 2000.75, 2001.0, 2001.25, 2001.5, 2001.75, 2002.0, 2002.25, 2002.5, 2002.75, 2003.0, 2003.25,  2003.5, 2003.75, 2004.0, 2004.25, 2004.5, 2004.75, 2005.0, 2005.25, 2005.5, 2005.75, 2006.0, 2006.25, 2006.5, 2006.75, 2007.0, 2007.25, 2007.5, 2007.75, 2008.0, 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak','pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list']
+
+timeline2008_dropcols = [2007.25, 2007.5, 2007.75, 2008.0, 2008.25, 2008.5, 2008.75, 2009.0, 2009.25, 2009.5, 2009.75, 2010.0, 2010.25, 2010.5, 2010.75, 2011.0, 2011.25, 2011.5, 2011.75, 2012.0, 2012.25, 2012.5, 2012.75, 2013.0, 2013.25, 2013.5, 2013.75, 2014.0, 2014.25, 2014.5, 2014.75, 2015.0, 2015.25, 2015.5, 2015.75, 2016.0, 2016.25, 2016.5, 2016.75, 2017.0, 2017.25, 2017.5, 2017.75, 2018.0, 2018.25, 2018.5, 2018.75, 2019.0, 2019.25, 2019.5, 2019.75, 2020.0, 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak','pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list']
+
+timelinefull_dropcols = [2000.25, 2000.5, 2000.75, 2001.0, 2001.25, 2001.5, 2001.75, 2002.0, 2002.25, 2002.5, 2002.75, 2003.0, 2003.25,  2003.5, 2003.75, 2004.0, 2004.25, 2004.5, 2004.75, 2005.0, 2005.25, 2005.5, 2005.75, 2006.0, 2006.25, 2006.5, 2006.75, 2007.0, 2007.25, 2007.5, 2007.75, 2008.0, 2008.25, 2008.5, 2008.75, 2009.0, 2009.25, 2009.5, 2009.75, 2010.0, 2010.25, 2010.5, 2010.75, 2011.0, 2011.25, 2011.5, 2011.75, 2012.0, 2012.25, 2012.5, 2012.75, 2013.0, 2013.25, 2013.5, 2013.75, 2014.0, 2014.25, 2014.5, 2014.75, 2015.0, 2015.25, 2015.5, 2015.75, 2016.0, 2016.25, 2016.5, 2016.75, 2017.0, 2017.25, 2017.5, 2017.75, 2018.0, 2018.25, 2018.5, 2018.75, 2019.0, 2019.25, 2019.5, 2019.75, 2020.0, 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak','pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list']
+
 
 #This file takes the quarterly raw data from the QCEW and turns them into quarterly timelines. From here, we can compute target variables.
 
@@ -20,7 +29,8 @@ def create_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
     returns: df, Dataframe
     exports a json file (used in plotting results)
     '''
-    
+
+
     # #create a dataframe of the years in question
     # if recession == 2001:
     #     timeline = recession2001_years
@@ -93,6 +103,8 @@ def create_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
         dropcols = timeline2001_dropcols
     elif recession == 2008:
         dropcols = timeline2008_dropcols
+    elif recession == 'full':
+        dropcols = timelinefull_dropcols
     df3 = df3.drop(columns = dropcols)
 
     #creates a new dataset to store derived fields
@@ -112,7 +124,7 @@ def create_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
     
     #export the data
     if save:
-        savepath = "data/exported_dataframes/" + dimension + str(recession) + '_timeline.json'
+        savepath = "data/timelines/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json"
         df.to_json(savepath)
 
     return df
