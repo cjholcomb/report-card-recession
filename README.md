@@ -106,7 +106,11 @@
                         <li>decline: the number of quarters between the pre-peak and the nadir.
                         <li>delta: the difference between pre-peak and post-peak.
                     </ul>
-    <h2>
+    <h2>3. Timeline Charting: The Vector Class</h2>
+                <p>In order to support the Flask app, I need a good-looking chart to easily show the economic progress of a selected unit. I created charting.py to contain all the various charting functions needed.
+                <p>I created a class Vector to gather all the necessary information and plot the various graphs. It is agnostic to recession, dimension, and target, to minimize technical debt.
+                <p>A single vector will be charted as below:
+                <img src="img/plot_single.png" alt="plot_single"></img>
             
 
  

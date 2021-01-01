@@ -55,6 +55,8 @@ class Recession(object):
         year in which recession event takes place
     event_quarter : float
         quarter in which recession event takes place
+    event_label : str
+        read-friendly description of recession event
     quarters : list
         list of quarters included in recession analysis
     xaxis : list
