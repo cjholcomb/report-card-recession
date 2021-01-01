@@ -81,7 +81,7 @@ class Area(object):
 
     Attributes
     ----------
-    fips : str
+    index : str
         index variable/unique identifier. Must be 5 digits.
     title : str
         Reader-friendly display text for the area. 
@@ -105,7 +105,7 @@ class Area(object):
                 area-fips code (unique identifer) of the area.
         """
 
-        self.fips = fips
+        self.index = fips
         self.title = area_titles[fips]
         if fips.startswith('US'):
             self.type = 'Nationwide'

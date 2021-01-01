@@ -76,7 +76,7 @@ class Industry(object):
 
     Attributes
     ----------
-    code : int
+    index : int
         index variable/unique identifier.
     title : str
         Reader-friendly display text for the industry.
@@ -103,7 +103,7 @@ class Industry(object):
             code : int
                 numeric unique identifer of the industry.
         """
-        self.code = code
+        self.index = code
         self.title = industry_titles[code]
         self.generation = self.derive_generation(code)
         if code == 10:

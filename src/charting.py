@@ -24,27 +24,27 @@ class Vector(object):
     ----------
     key : int or str
         index of vector, unique identifier
-    recession : int
-        recession being charted
+    recession : object
+        Recession class object (recessions.py)
     dimension : str ('area' or 'industry')
         dimension being charted
     variable : str (month3_emplvl, avg_wkly_wage, or qrtly_estabs_count)
         variable/target being charted    
     df : pandas dataframe
         full timeline stored in a df
-    event_quarter : float
+    !event_quarter : float
         quarter in which the recession event takes place
-    event_label : str
+    !event_label : str
         read-friendly description of recession event
     index_col : int
         column that contains the unique identifier within the timeline
     index_title : int
         column that contains the reader-friendly industry/area title within the timeline
-    x : list
+    !x : list
         list of relevant quarters to use as an X-axis
     y : array-like
         datapoints to plot on the chart
-    y_end : int
+    !y_end : int
         number of columns to chart
     label : str
         reader-friendly title for the chart
@@ -101,34 +101,35 @@ class Vector(object):
             
         """
         self.key = key
-        self.recession = recession
+        self.recession = Recession(recession)
         self.dimension = dimension
         self.variable = variable
         filepath =  "data/timelines_w_targets/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json" 
-        self.y_end = end_columns[recession]
+        # self.y_end = end_columns[recession]
         df = pd.read_json(filepath)
         if dimension == 'industry':
             self.index_col = 'industry_code'
             self.index_title = 'industry_title'
+            self.row = Industry(key)
         elif dimension == 'area':
             self.index_col = 'area_fips'
             self.index_title = 'area_title'
+            self.row = Area(key)
         df = df.set_index(self.index_col)
         self.df = df
-        self.event_quarter = recession_events[recession]
-        self.event_label = events_display[recession]
-        recession = Recession(recession)
-        self.x = recession.xaxis
-        self.y = df.loc[key][1:self.y_end]
+        # self.event_quarter = recession_events[recession]
+        # self.event_label = events_display[recession]
+        # self.x = self.recession.xaxis
+        self.y = df.loc[key][1:self.recession.y_end]
         self.label = df[self.index_title].loc[key]
         self.nadir = df['nadir'].loc[key]
-        self.nadir_qtr = df['nadir_qtr'].loc[key] / 4 + recession.years[0]
+        self.nadir_qtr = df['nadir_qtr'].loc[key] / 4 + self.recession.years[0]
         self.pre_peak = df['pre_peak'].loc[key]
-        self.pre_peak_qtr = df['pre_peak_qtr'].loc[key] / 4 + recession.years[0]
+        self.pre_peak_qtr = df['pre_peak_qtr'].loc[key] / 4 + self.recession.years[0]
         self.post_peak = df['post_peak'].loc[key]
-        self.post_peak_qtr = df['post_peak_qtr'].loc[key] / 4 + recession.years[0]
+        self.post_peak_qtr = df['post_peak_qtr'].loc[key] / 4 + self.recession.years[0]
         self.recovery = df['recovery'].loc[key]
-        self.recovery_qtr = (df['nadir_qtr'].loc[key] + df['recovery_qtr'].loc[key]) / 4 + recession.years[0]
+        self.recovery_qtr = (df['nadir_qtr'].loc[key] + df['recovery_qtr'].loc[key]) / 4 + self.recession.years[0]
         self.decline = df['decline'].loc[key]
         self.delta = df['delta'].loc[key]
 
@@ -136,10 +137,10 @@ class Vector(object):
         fig, ax = plt.subplots(figsize = (15, 4))
 
         #plot the vector
-        ax.plot(self.x,self.y, color = 'navy', linewidth = 2, alpha = 0.8, label = None)
+        ax.plot(self.recession.xaxis, self.y, color = 'navy', linewidth = 2, alpha = 0.8, label = None)
         
         #plot the recession event
-        ax.axvline(x = quarters_display[self.event_quarter], color = 'black', linewidth = 1, alpha = .8, label = self.event_label, linestyle = '--')
+        ax.axvline(x = quarters_display[self.recession.event_quarter], color = 'black', linewidth = 1, alpha = .8, label = self.recession.event_label, linestyle = '--')
         
         #color the decline, recovery, and growth
         ax.fill_between(x = (quarters_display[self.pre_peak_qtr], quarters_display[self.nadir_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'red', alpha = 0.1, label = 'Decline')
@@ -147,7 +148,7 @@ class Vector(object):
             ax.fill_between(x = (quarters_display[self.nadir_qtr], quarters_display[self.recovery_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery')
             ax.fill_between(x = (quarters_display[self.recovery_qtr], quarters_display[self.post_peak_qtr]), y1 = self.pre_peak, y2 = self.post_peak, color = 'green', alpha = 0.1, label = 'Growth')
         else:
-            ax.fill_between(x = (quarters_display[self.nadir_qtr], self.x[-1]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery (incomplete)')
+            ax.fill_between(x = (quarters_display[self.nadir_qtr], self.recession.xaxis[-1]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery (incomplete)')
         
         #define the title
         if self.variable == 'month3_emplvl':
@@ -156,7 +157,7 @@ class Vector(object):
             vartitle = ' Wages: '
         elif self.variable == 'qtrly_estabs_count':
             vartitle = ' Firms: '
-        title = str(self.recession) + ' Recession' + vartitle + self.label
+        title = str(self.recession.event_year) + ' Recession' + vartitle + self.label
         ax.set_title(title + ' (' + str(self.key) + ')')
         
         #set remaining chart properties and show
@@ -181,11 +182,11 @@ class Vector(object):
         df = self.df
         fig, ax = plt.subplots(figsize = (15, 4))
         for key in keys:
-            y = df.loc[key][1:self.y_end]
+            y = df.loc[key][1:self.recession.y_end]
             label = str(key) + ": " + df[self.index_title].loc[key]
-            ax.plot(self.y, linewidth = 1, alpha = 0.8, label = label)
+            ax.plot(self.recession.xaxis, self.y, linewidth = 1, alpha = 0.8, label = label)
         if title:
-            ax.set_title(title + ' (' + str(self.key) + ')')
+            ax.set_title(title)
         ax.tick_params(axis='both', which='major', labelsize=10)
         ax.tick_params(axis='both', which='minor', labelsize=10)
         ax.ticklabel_format(style = 'plain', axis = 'y', scilimits = (9, -1)) 
@@ -198,25 +199,21 @@ class Vector(object):
     def plot_children(self):
         if self.dimension != 'industry':
             pass
-        industry = Industry(self.key)
-        title = 'Child industries of ' +  str(self.key) +  self.label
-        keys = industry.children
+        title = 'Child industries of ' +  str(self.key) + ': ' + self.row.title
+        keys = self.row.children
         self.plot_mulitple(keys = keys, title = title)
 
-    def plot_parent(self):
+    def plot_parent(self, title = None):
         if self.dimension != 'industry':
             pass
-        industry = Industry(self.key)
-        title = str(industry.code) + ": " +  industry.title
-        keys = [industry.parent]
+        keys = [self.row.parent]
         self.plot_mulitple(keys = keys, title = title)
 
     def plot_siblings(self):
         if self.dimension != 'industry':
             pass
-        industry = Industry(self.key)
-        title = 'Child industries of ' +  str(self.key) +  self.label
-        keys = industry.siblings
+        title = 'Child industries of ' +  str(self.row.code) +  self.row.title
+        keys = self.row.siblings
         self.plot_mulitple(keys = keys, title = title)
 
 def plot_lines(keys, recession, dimension, variable, markers = ['event', 'nadir', 'pre-peak,', 'post-peak', 'recovery', 'status'], style = 'darkgrid', savepath = 'None'):
