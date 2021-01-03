@@ -61,6 +61,8 @@ class Recession(object):
         list of quarters included in recession analysis
     xaxis : list
         list of reader-friendly quarters in recession analys
+    import_schema :
+        
 
 
     Methods

@@ -4,15 +4,14 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
+from produce_datasets import filepath
+
 from recessions import *
 from areas import *
 from industries import *
 
+
 sns.set_style('darkgrid')
-
-
-
-
 
 class Vector(object):
     """
@@ -86,6 +85,7 @@ class Vector(object):
     def __init__ (self, key, recession = 2001, dimension ='area' , variable='month3_emplvl'):
         """
         Constructs the points needed to chart the vector.
+        Some attributes will be Recession, Industry, or Area class objects.
 
         Parameters
         ----------
@@ -104,9 +104,10 @@ class Vector(object):
         self.recession = Recession(recession)
         self.dimension = dimension
         self.variable = variable
-        filepath =  "data/timelines_w_targets/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json" 
+        loadpath = filepath(recession = recession, dimension = dimension , variable = variable, charttype = 'target')
+        # filepath =  "data/timelines_w_targets/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json" 
         # self.y_end = end_columns[recession]
-        df = pd.read_json(filepath)
+        df = pd.read_json(loadpath)
         if dimension == 'industry':
             self.index_col = 'industry_code'
             self.index_title = 'industry_title'
@@ -133,7 +134,7 @@ class Vector(object):
         self.decline = df['decline'].loc[key]
         self.delta = df['delta'].loc[key]
 
-    def plot_single(self):
+    def plot_single(self, colorcode = True):
         fig, ax = plt.subplots(figsize = (15, 4))
 
         #plot the vector
@@ -142,14 +143,15 @@ class Vector(object):
         #plot the recession event
         ax.axvline(x = quarters_display[self.recession.event_quarter], color = 'black', linewidth = 1, alpha = .8, label = self.recession.event_label, linestyle = '--')
         
-        #color the decline, recovery, and growth
-        ax.fill_between(x = (quarters_display[self.pre_peak_qtr], quarters_display[self.nadir_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'red', alpha = 0.1, label = 'Decline')
-        if self.recovery:
-            ax.fill_between(x = (quarters_display[self.nadir_qtr], quarters_display[self.recovery_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery')
-            ax.fill_between(x = (quarters_display[self.recovery_qtr], quarters_display[self.post_peak_qtr]), y1 = self.pre_peak, y2 = self.post_peak, color = 'green', alpha = 0.1, label = 'Growth')
-        else:
-            ax.fill_between(x = (quarters_display[self.nadir_qtr], self.recession.xaxis[-1]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery (incomplete)')
-        
+        if colorcode:
+            #color the decline, recovery, and growth
+            ax.fill_between(x = (quarters_display[self.pre_peak_qtr], quarters_display[self.nadir_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'red', alpha = 0.1, label = 'Decline')
+            if self.recovery:
+                ax.fill_between(x = (quarters_display[self.nadir_qtr], quarters_display[self.recovery_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery')
+                ax.fill_between(x = (quarters_display[self.recovery_qtr], quarters_display[self.post_peak_qtr]), y1 = self.pre_peak, y2 = self.post_peak, color = 'green', alpha = 0.1, label = 'Growth')
+            else:
+                ax.fill_between(x = (quarters_display[self.nadir_qtr], self.recession.xaxis[-1]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery (incomplete)')
+            
         #define the title
         if self.variable == 'month3_emplvl':
             vartitle = ' Jobs: '
