@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 
 from recessions import recessions_int, dim_abbr, var_abbr, quarters_display
+from industries import industry_titles
 
 #lists of variables to drop during timeline construction
 dropcols_str = {2001:['2000.25', '2000.5', '2000.75', '2001.0', '2001.25', '2001.5', '2001.75', '2002.0', '2002.25', '2002.5', '2002.75', '2003.0', '2003.25', '2003.5', '2003.75', '2004.0', '2004.25', '2004.5', '2004.75', '2005.0', '2005.25', '2005.5', '2005.75', '2006.0', '2006.25', '2006.5', '2006.75', '2007.0', '2007.25', '2007.5', '2007.75', '2008.0', 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak','pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list'],
@@ -125,12 +126,15 @@ def basic_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 2
         index = ['area_fips', 'area_title']
     elif dimension == 'industry':
         index = ['industry_code', 'industry_title']
+        #correct for changes in NAICS classification
+        df['industry_title'] = df['industry_code'].apply(lambda x: industry_titles[x])
+    
     
     #pivots the table to arrange quarters in columns, drops extraneous variables.
     df = df.pivot_table(columns = 'qtrid', values = variable, index = index, aggfunc = np.sum)
     df = df.reset_index()
     
-    #fill nans
+        #fill nans
     df = df.fillna(0)
     
     #export the data
@@ -277,13 +281,12 @@ def proportional_timeline(variable = 'month3_emplvl', dimension = 'area', recess
         pass
     # filepath =  "data/timelines/targets/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json" 
     loadpath = filepath(variable = variable, dimension = dimension, charttype= 'target', recession = recession, filetype = 'json')
-    print(loadpath)
     df = pd.read_json(loadpath)
     df = df.drop(columns =  ['nadir', 'nadir_qtr', 'pre_peak_qtr', 'post_peak', 'post_peak_qtr', 'recovery', 'recovery_qtr', 'decline', 'delta'])
     count = -6
     drop_list = ['pre_peak']
     for column in df.columns [2:-1]:
-        df[count] = (df['pre_peak'] - df[column]) / df['pre_peak']
+        df[count] = (df[column] - df['pre_peak']) / df['pre_peak']
         count += 1
         drop_list.append(column)
     df.drop(columns = drop_list, inplace= True)
@@ -314,7 +317,7 @@ def export_all(basic = False, target = False, proportion = False):
         for dimension in ['area', 'industry']: 
             for variable in ['month3_emplvl', 'avg_wkly_wage', 'qtrly_estabs_count']: 
                 for recession in [2001, 2008]: 
-                    target_timeline(variable = variable, dimension = dimension, recession = recession, save = True, loadjson= True)
+                    target_timeline(variable = variable, dimension = dimension, recession = recession, save = True, loadjson= basic )
     if proportion:
         for dimension in ['area', 'industry']: 
             for variable in ['month3_emplvl', 'avg_wkly_wage', 'qtrly_estabs_count']: 

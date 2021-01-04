@@ -29,22 +29,16 @@ class Vector(object):
         dimension being charted
     variable : str (month3_emplvl, avg_wkly_wage, or qrtly_estabs_count)
         variable/target being charted    
-    df : pandas dataframe
-        full timeline stored in a df
-    !event_quarter : float
-        quarter in which the recession event takes place
-    !event_label : str
-        read-friendly description of recession event
     index_col : int
         column that contains the unique identifier within the timeline
     index_title : int
         column that contains the reader-friendly industry/area title within the timeline
-    !x : list
-        list of relevant quarters to use as an X-axis
+    row : object (Industry or Area)
+        class object to pull additional attributes.
+    df : pandas dataframe
+        full timeline stored in a df 
     y : array-like
-        datapoints to plot on the chart
-    !y_end : int
-        number of columns to chart
+        datapoints to plot on the chart 
     label : str
         reader-friendly title for the chart
     nadir : float
@@ -66,14 +60,14 @@ class Vector(object):
     decline : int
         number of quarters between the pre-peak and the nadir.
     delta : float
-        difference between pre-peak and post-peak.
+        difference between pre-peak and post-peak.  
     
     Methods
     -------
     plot_single:
         Produces a timeline of a single vector with relevant areas shaded.
     plot_multiple:
-        plots multiple vectora on the same chart
+        plots multiple vectors on the same chart
     plot_children:
         plots all child industries of a single industry
     plot_parent:
@@ -96,10 +90,9 @@ class Vector(object):
             dimension : str 
                 dimension of data to import. Must be 'area' or 'industry'. Default = 'area'.
             variable : str 
-                determines what economic indicator will be used in the timeline. Must be one of ['month3_emplvl' (employment), 'avg_wkly_wage' (wages), 'qtrly_estabs_count'(firms)]
-            
-            
+                determines what economic indicator will be used in the timeline. Must be one of ['month3_emplvl' (employment), 'avg_wkly_wage' (wages), 'qtrly_estabs_count'(firms)]     
         """
+        
         self.key = key
         self.recession = Recession(recession)
         self.dimension = dimension
@@ -135,6 +128,18 @@ class Vector(object):
         self.delta = df['delta'].loc[key]
 
     def plot_single(self, colorcode = True):
+        """
+        Plots the vector by itself.
+
+        Parameters
+        ----------
+            colorcode : bool
+                Determines if decline, recovery, and growth sections will be highlighted on the graph
+
+        Returns
+        -------
+            fig : matplotlib plot
+        """
         fig, ax = plt.subplots(figsize = (15, 4))
 
         #plot the vector
@@ -159,6 +164,7 @@ class Vector(object):
             vartitle = ' Wages: '
         elif self.variable == 'qtrly_estabs_count':
             vartitle = ' Firms: '
+        ax.set_ylabel(vartitle)
         title = str(self.recession.event_year) + ' Recession' + vartitle + self.label
         ax.set_title(title + ' (' + str(self.key) + ')')
         
@@ -168,9 +174,10 @@ class Vector(object):
         ax.ticklabel_format(style = 'plain', axis = 'y', scilimits = (9, -1)) 
         ax.get_yaxis().set_major_formatter(mtick.FuncFormatter(lambda x, p: format(int(x), ',')))
         ax.legend(fancybox = True, borderaxespad=0)
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.show()
+        ax.xticks(rotation=45)
+        ax.set_ylabel(vartitle)
+        ax.tight_layout()
+        return fig
 
         #plot pre-peak, nadir, and recovery. Commented out for now
         ''' 
@@ -181,12 +188,26 @@ class Vector(object):
         '''
         
     def plot_mulitple(self, keys, title = None):
+        """
+        Plots a series of lines.
+
+        Parameters
+        ----------
+            keys : list or list-like
+                list of indicies to be plotted on the chart.
+            title : str, default None
+                overwrites automatic assignment of chart title.
+
+        Returns
+        -------
+            fig : matplotlib plot
+        """
         df = self.df
         fig, ax = plt.subplots(figsize = (15, 4))
         for key in keys:
             y = df.loc[key][1:self.recession.y_end]
             label = str(key) + ": " + df[self.index_title].loc[key]
-            ax.plot(self.recession.xaxis, self.y, linewidth = 1, alpha = 0.8, label = label)
+            ax.plot(self.recession.xaxis, y, linewidth = 1, alpha = 0.8, label = label)
         if title:
             ax.set_title(title)
         ax.tick_params(axis='both', which='major', labelsize=10)
@@ -199,68 +220,129 @@ class Vector(object):
         plt.show()
     
     def plot_children(self):
+        """
+        Plots all child industries of the vector
+
+        Parameters
+        ----------
+            None
+
+        Returns
+        -------
+            fig : matplotlib plot
+        """
         if self.dimension != 'industry':
             pass
-        title = 'Child industries of ' +  str(self.key) + ': ' + self.row.title
+        title = 'Child industries of: ' + self.row.title + " (" + str(self.key) + ")" 
         keys = self.row.children
-        self.plot_mulitple(keys = keys, title = title)
+        return self.plot_mulitple(keys = keys, title = title)
 
     def plot_parent(self, title = None):
+        """
+        Plots the parent industry of the vector
+
+        Parameters
+        ----------
+            title : str, default None
+                overwrites automatic assignment of chart title.
+
+        Returns
+        -------
+            fig : matplotlib plot
+        """
         if self.dimension != 'industry':
             pass
         keys = [self.row.parent]
-        self.plot_mulitple(keys = keys, title = title)
+        return self.plot_mulitple(keys = keys, title = title)
 
     def plot_siblings(self):
+        """
+        Plots all sibling industries of the vector, including the vector itself.
+
+        Parameters
+        ----------
+            None
+
+        Returns
+        -------
+            fig : matplotlib plot
+        """
         if self.dimension != 'industry':
             pass
-        title = 'Child industries of ' +  str(self.row.code) +  self.row.title
+        title = 'Sibling industries of: ' + self.row.title + " (" + str(self.key) + ")"
         keys = self.row.siblings
-        self.plot_mulitple(keys = keys, title = title)
+        return self.plot_mulitple(keys = keys, title = title)
 
-def plot_lines(keys, recession, dimension, variable, markers = ['event', 'nadir', 'pre-peak,', 'post-peak', 'recovery', 'status'], style = 'darkgrid', savepath = 'None'):
-    sns.set_style('darkgrid')
-    fig, ax = plt.subplots(figsize = (len(recession.quarters),5))
-    x = recession.xaxis
-    ax.set_title(recession.event_year + ' Recession')
-    ax.tick_params(axis='both', which='major', labelsize=10)
-    ax.tick_params(axis='both', which='minor', labelsize=10)
-    ax.ticklabel_format(style = 'plain', axis = 'y', scilimits = (9, -1)) 
-    ax.get_yaxis().set_major_formatter(mtick.FuncFormatter(lambda x, p: format(int(x), ',')))
-    if 'event' in markers:
-        ax.axvline(x = quarters_display[recession.event_quarter], color = 'black', linewidth = 0.5, alpha = 0.5, label = events_display[recession.event_year])
-    if 'nadir' in markers:
-        ax.axhline(y = self.nadir_2001, xmin = 'Q1 2000', xmax = 'Q4 2007', 
-                    color = 'red', linewidth = .5, alpha = 0.5, label = 'nadir')
+def recession_comparison(key, variable, dimension):
+    '''
+    Creates the "scary chart"- proportional growth for a single area/industry. All recessions included in chart.
 
-    
-    for key in list(keys):
-        if dimension == 'area':
-            if variable == 'month3_emplvl':
-                y = recession.area_empl['area_fips'[key]]
-            if variable == 'avg_wkly_wage':
-                y = recession.area_wage['area_fips'[key]]
-            if variable == 'qtrly_estabs_count':
-                y = recession.area_firm['area_fips'[key]]
-        if dimension == 'industry':
-            if variable == 'month3_emplvl':
-                y = recession.indus_empl['area_fips'[key]]
-            if variable == 'avg_wkly_wage':
-                y = recession.indus_wage['area_fips'[key]]
-            if variable == 'qtrly_estabs_count':
-                y = recession.indus_firm['area_fips'[key]]
+        Parameters: 
+            key (str or int): area-fips or industry_code
+            variable (str): determines what economic indicator will be used in the timeline. Must be one of ['month3_emplvl' (employment), 'avg_wkly_wage' (wages), 'qtrly_estabs_count'(firms)]
+            dimension (str): dimension of data to chart.
+            
+        Returns: 
+            fig (matplotlib plot)
+    '''
+    fig, ax = plt.subplots(figsize =(15, 10))
+    if dimension == 'area':
+        index = 'area_fips'
+        title = 'Recession Comparison, ' + area_titles[key] + ': ' + var_abbr[variable]
+    elif dimension == 'industry':
+        index = 'industry_code'
+        title = 'Recession Comparison, ' + industry_titles[key] + ': ' + var_abbr[variable]
+    for recession in recessions_int.keys():
+        if recession == 'full':
+            break
+        loadpath = filepath(variable = variable, dimension = dimension, charttype = 'proportional', recession = recession, filetype = 'json')
+        df = pd.read_json(loadpath)
+        df.set_index(index, inplace = True)
+        ax.plot(df.loc[key][1:-1]*100, label = str(recession), linewidth = 0.5, alpha = 0.8)
+    ax.axvline(x = 6, color = 'black', linewidth = 0.5, alpha = 0.5, label = 'Event Quarter', ls = '--')
+    ax.axhline(y = 0, color = 'black', ls = ':', label = 'Pre-Recession baseline')
+    ax.set_xlabel('Quarters since start of recession')
+    ax.set_ylabel('Growth')
+    ax.set_title(title)
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    plt.legend()
+    plt.show()
+    return fig
 
-    def plot_2001(self):
-        y = self.y_2001
-        ax.plot(x,y, color = 'green', linewidth = 1, alpha = 0.8)
-        ax.axhline(y = self.nadir_2001, xmin = 'Q1 2000', xmax = 'Q4 2007', 
-                    color = 'red', linewidth = .5, alpha = 0.5, label = 'nadir')
-        ax.axhline(y = self.pre_peak_2001, xmin = 'Q1 2000', xmax = 'Q4 2007',
-                    color = 'blue', linewidth = .5, alpha = .5, label = 'pre-recession-peak')
-        
-        ax.axvline(x = 'Q3 2001', color = 'black', linewidth = 0.5, alpha = 0.5, label = '09/11/2001')
-        ax.legend(fancybox = True, borderaxespad=0)
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.savefig('src/static/images/plot_2001.png')
-        return fig, ax
+def variable_comparison(key, recession, dimension):
+    '''
+    Creates the "scary chart"- proportional growth for a single area/industry. All recessions included in chart.
+
+        Parameters: 
+            key (str or int): area-fips or industry_code
+            recession (int): determines which recession timeline to chart. 'full' will cause function to exit.
+            dimension (str): dimension of data to chart.
+            
+        Returns: 
+            fig (matplotlib plot)
+    '''
+    if recession ='full':
+        pass
+    fig, ax = plt.subplots(figsize =(15, 10))
+    if dimension == 'area':
+        index = 'area_fips'
+        title = area_titles[key] + ' (' + str(key) + ') ' + 'performance: ' + str(recession) + ' recession'
+    elif dimension == 'industry':
+        index = 'industry_code'
+        title = industry_titles[key] + ' (' + str(key) + ') ' + 'performance: ' + str(recession) + ' recession'
+    for variable in var_abbr.keys():
+        if recession == 'full':
+            break
+        loadpath = filepath(variable = variable, dimension = dimension, charttype = 'proportional', recession = recession, filetype = 'json')
+        df = pd.read_json(loadpath)
+        df.set_index(index, inplace = True)
+        ax.plot((df.loc[key][1:-1])*100, label = var_abbr[variable], linewidth = 0.5, alpha = 0.8)
+    ax.axvline(x = 6, color = 'black', linewidth = 0.5, alpha = 0.5, label =  events_display[recession], ls = '--')
+    ax.axhline(y = 0, color = 'black', ls = ':', label = 'Pre-Recession baseline')
+    ax.set_xlabel('Quarters since start of recession')
+    ax.set_ylabel('Growth')
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    ax.set_title(title)
+    plt.legend()
+    plt.show()
+    return fig
