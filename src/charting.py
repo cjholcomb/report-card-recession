@@ -10,6 +10,7 @@ from recessions import *
 from areas import *
 from industries import *
 
+var_display ={'month3_emplvl': 'Total Employment', 'avg_wkly_wage': 'Avg. Weekly Wages', 'qtrly_estabs_count':'# of Establishments/Firms'}
 
 sns.set_style('darkgrid')
 
@@ -151,6 +152,7 @@ class Vector(object):
         if colorcode:
             #color the decline, recovery, and growth
             ax.fill_between(x = (quarters_display[self.pre_peak_qtr], quarters_display[self.nadir_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'red', alpha = 0.1, label = 'Decline')
+            # ax.fill_between(x = (quarters_display[self.pre_peak_qtr], quarters_display[self.nadir_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'red', alpha = 0.1, label = 'Decline')
             if self.recovery:
                 ax.fill_between(x = (quarters_display[self.nadir_qtr], quarters_display[self.recovery_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery')
                 ax.fill_between(x = (quarters_display[self.recovery_qtr], quarters_display[self.post_peak_qtr]), y1 = self.pre_peak, y2 = self.post_peak, color = 'green', alpha = 0.1, label = 'Growth')
@@ -158,14 +160,7 @@ class Vector(object):
                 ax.fill_between(x = (quarters_display[self.nadir_qtr], self.recession.xaxis[-1]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery (incomplete)')
             
         #define the title
-        if self.variable == 'month3_emplvl':
-            vartitle = ' Jobs: '
-        elif self.variable == 'avg_wkly_wage':
-            vartitle = ' Wages: '
-        elif self.variable == 'qtrly_estabs_count':
-            vartitle = ' Firms: '
-        ax.set_ylabel(vartitle)
-        title = str(self.recession.event_year) + ' Recession' + vartitle + self.label
+        title = str(self.recession.event_year) + ' Recession: ' + self.label
         ax.set_title(title + ' (' + str(self.key) + ')')
         
         #set remaining chart properties and show
@@ -174,9 +169,10 @@ class Vector(object):
         ax.ticklabel_format(style = 'plain', axis = 'y', scilimits = (9, -1)) 
         ax.get_yaxis().set_major_formatter(mtick.FuncFormatter(lambda x, p: format(int(x), ',')))
         ax.legend(fancybox = True, borderaxespad=0)
-        ax.xticks(rotation=45)
-        ax.set_ylabel(vartitle)
-        ax.tight_layout()
+        plt.xticks(rotation=45)
+        ax.set_ylabel(var_display[self.variable])
+        plt.tight_layout()
+        plt.show()
         return fig
 
         #plot pre-peak, nadir, and recovery. Commented out for now
@@ -215,6 +211,7 @@ class Vector(object):
         ax.ticklabel_format(style = 'plain', axis = 'y', scilimits = (9, -1)) 
         ax.get_yaxis().set_major_formatter(mtick.FuncFormatter(lambda x, p: format(int(x), ',')))
         ax.legend(fancybox = True, borderaxespad=0)
+        ax.set_ylabel(var_display[self.variable])
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.show()
@@ -253,6 +250,7 @@ class Vector(object):
         if self.dimension != 'industry':
             pass
         keys = [self.row.parent]
+        title = 'Parent industry of: ' + self.row.title + " (" + str(self.key) + ")" 
         return self.plot_mulitple(keys = keys, title = title)
 
     def plot_siblings(self):
@@ -288,21 +286,21 @@ def recession_comparison(key, variable, dimension):
     fig, ax = plt.subplots(figsize =(15, 10))
     if dimension == 'area':
         index = 'area_fips'
-        title = 'Recession Comparison, ' + area_titles[key] + ': ' + var_abbr[variable]
+        title = 'Recession Comparison, ' + area_titles[key] + " (" + str(key) + ")" 
     elif dimension == 'industry':
         index = 'industry_code'
-        title = 'Recession Comparison, ' + industry_titles[key] + ': ' + var_abbr[variable]
+        title = 'Recession Comparison: ' + industry_titles[key] + " (" + str(key) + ")" 
     for recession in recessions_int.keys():
         if recession == 'full':
             break
         loadpath = filepath(variable = variable, dimension = dimension, charttype = 'proportional', recession = recession, filetype = 'json')
         df = pd.read_json(loadpath)
         df.set_index(index, inplace = True)
-        ax.plot(df.loc[key][1:-1]*100, label = str(recession), linewidth = 0.5, alpha = 0.8)
-    ax.axvline(x = 6, color = 'black', linewidth = 0.5, alpha = 0.5, label = 'Event Quarter', ls = '--')
-    ax.axhline(y = 0, color = 'black', ls = ':', label = 'Pre-Recession baseline')
+        ax.plot(df.loc[key][1:-1]*100, label = str(recession), linewidth = 1.5, alpha = 0.8)
+    ax.axvline(x = 6, color = 'black', linewidth = 0.8, alpha = 0.5, ls = ':', label = 'Event Quarter')
+    ax.axhline(y = 0, color = 'black', linewidth = 0.8, alpha = 0.5, ls = '--', label = 'Pre-Recession baseline')
     ax.set_xlabel('Quarters since start of recession')
-    ax.set_ylabel('Growth')
+    ax.set_ylabel('Growth: ' + var_display[variable])
     ax.set_title(title)
     ax.yaxis.set_major_formatter(mtick.PercentFormatter())
     plt.legend()
@@ -321,7 +319,7 @@ def variable_comparison(key, recession, dimension):
         Returns: 
             fig (matplotlib plot)
     '''
-    if recession ='full':
+    if recession == 'full':
         pass
     fig, ax = plt.subplots(figsize =(15, 10))
     if dimension == 'area':
@@ -336,9 +334,9 @@ def variable_comparison(key, recession, dimension):
         loadpath = filepath(variable = variable, dimension = dimension, charttype = 'proportional', recession = recession, filetype = 'json')
         df = pd.read_json(loadpath)
         df.set_index(index, inplace = True)
-        ax.plot((df.loc[key][1:-1])*100, label = var_abbr[variable], linewidth = 0.5, alpha = 0.8)
-    ax.axvline(x = 6, color = 'black', linewidth = 0.5, alpha = 0.5, label =  events_display[recession], ls = '--')
-    ax.axhline(y = 0, color = 'black', ls = ':', label = 'Pre-Recession baseline')
+        ax.plot((df.loc[key][1:-1])*100, label = var_display[variable], linewidth = 1.5, alpha = 0.8)
+    ax.axvline(x = 6, color = 'black', linewidth = 0.8, alpha = 0.5, ls = ':', label =  events_display[recession],)
+    ax.axhline(y = 0, color = 'black', linewidth = 0.8, alpha = 0.5, ls = '--', label = 'Pre-Recession baseline')
     ax.set_xlabel('Quarters since start of recession')
     ax.set_ylabel('Growth')
     ax.yaxis.set_major_formatter(mtick.PercentFormatter())
