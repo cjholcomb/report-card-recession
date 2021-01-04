@@ -151,8 +151,8 @@ class Vector(object):
         
         if colorcode:
             #color the decline, recovery, and growth
+            # ax.fill_between(x = (quarters_display[self.pre_peak_qtr], quarters_display[self.nadir_qtr]), y1 = self.nadir, y2 = np.full(len(self.y),self.pre_peak), color = 'red', alpha = 0.1, label = 'Decline')
             ax.fill_between(x = (quarters_display[self.pre_peak_qtr], quarters_display[self.nadir_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'red', alpha = 0.1, label = 'Decline')
-            # ax.fill_between(x = (quarters_display[self.pre_peak_qtr], quarters_display[self.nadir_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'red', alpha = 0.1, label = 'Decline')
             if self.recovery:
                 ax.fill_between(x = (quarters_display[self.nadir_qtr], quarters_display[self.recovery_qtr]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery')
                 ax.fill_between(x = (quarters_display[self.recovery_qtr], quarters_display[self.post_peak_qtr]), y1 = self.pre_peak, y2 = self.post_peak, color = 'green', alpha = 0.1, label = 'Growth')
