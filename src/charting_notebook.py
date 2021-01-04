@@ -4,7 +4,7 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-from produce_datasets import filepath
+from produce_datasets_notebook import filepath
 
 from recessions import *
 from areas import *
@@ -101,6 +101,7 @@ class Vector(object):
         loadpath = filepath(recession = recession, dimension = dimension , variable = variable, charttype = 'target')
         # filepath =  "data/timelines_w_targets/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json" 
         # self.y_end = end_columns[recession]
+        print(loadpath)
         df = pd.read_json(loadpath)
         if dimension == 'industry':
             self.index_col = 'industry_code'
@@ -159,20 +160,13 @@ class Vector(object):
         ax.axvline(x = recession_event, color = 'black', linewidth = 1, alpha = .8, label = event_label, linestyle = '--')
         
         if colorcode:
-            x = self.recession.xaxis
-            y = self.y
-            y2 = self.pre_peak
-            pre_peak = x.index(quarters_display[self.pre_peak_qtr])
-            nadir = x.index(quarters_display[self.nadir_qtr])
-            
             #color the decline, recovery, and growth
-            ax.fill_between(x=xi, y1=y, y2=y2, color='red', alpha=0.1, label='Decline', where=(xi >= pre_peak) & (xi <= nadir))
+            ax.fill_between(x = xi, y1 = y, y2 = y2_decline , where=(xi >= x.index(x_decline[0])) & (xi <= x.index(x_decline[0])), color = 'red', alpha = 0.1, label = 'Decline')
             if self.recovery:
-                recovery = x.index(quarters_display[self.recovery_qtr])
-                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery', where=(xi >= nadir) & (xi <= recovery))
-                ax.fill_between(x=xi, y1=y, y2=y2, color='green', alpha=0.1, label='Growth', where=(xi >= recovery))
+                ax.fill_between(x = x_recovery, y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery')
+                ax.fill_between(x = (quarters_display[self.recovery_qtr], quarters_display[self.post_peak_qtr]), y1 = self.pre_peak, y2 = self.post_peak, color = 'green', alpha = 0.1, label = 'Growth')
             else:
-                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery (incomplete)', where=(xi >= nadir))
+                ax.fill_between(x = (quarters_display[self.nadir_qtr], self.recession.xaxis[-1]), y1 = self.nadir, y2 = self.pre_peak, color = 'gold', alpha = 0.1, label = 'Recovery (incomplete)')
             
         #define the title
         title = str(self.recession.event_year) + ' Recession: ' + self.label
@@ -299,6 +293,7 @@ def recession_comparison(key, variable, dimension):
             fig (matplotlib plot)
     '''
     fig, ax = plt.subplots(figsize =(15, 10))
+    ax.spines['bottom'].set_position('zero')
     if dimension == 'area':
         index = 'area_fips'
         title = 'Recession Comparison, ' + area_titles[key] + " (" + str(key) + ")" 
@@ -339,6 +334,7 @@ def variable_comparison(key, recession, dimension):
     if recession == 'full':
         pass
     fig, ax = plt.subplots(figsize =(15, 10))
+    ax.spines['bottom'].set_position('center')
     if dimension == 'area':
         index = 'area_fips'
         title = area_titles[key] + ' (' + str(key) + ') ' + 'performance: ' + str(recession) + ' recession'
