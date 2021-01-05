@@ -235,3 +235,63 @@ def create_training_dataset():
         if 'qtrly_estabs_count' in variables:
             self.indus_firm = create_timeline(variable = 'qtrly_estabs_count', dimension = 'area', recession = self.event_year, save = False)
  
+
+ from charting.py:
+
+ def plot_lines(keys, recession, dimension, variable, markers = ['event', 'nadir', 'pre-peak,', 'post-peak', 'recovery', 'status'], style = 'darkgrid', savepath = 'None'):
+    sns.set_style('darkgrid')
+    fig, ax = plt.subplots(figsize = (len(recession.quarters),5))
+    x = recession.xaxis
+    ax.set_title(recession.event_year + ' Recession')
+    ax.tick_params(axis='both', which='major', labelsize=10)
+    ax.tick_params(axis='both', which='minor', labelsize=10)
+    ax.ticklabel_format(style = 'plain', axis = 'y', scilimits = (9, -1)) 
+    ax.get_yaxis().set_major_formatter(mtick.FuncFormatter(lambda x, p: format(int(x), ',')))
+    if 'event' in markers:
+        ax.axvline(x = quarters_display[recession.event_quarter], color = 'black', linewidth = 0.5, alpha = 0.5, label = events_display[recession.event_year])
+    if 'nadir' in markers:
+        ax.axhline(y = self.nadir_2001, xmin = 'Q1 2000', xmax = 'Q4 2007', 
+                    color = 'red', linewidth = .5, alpha = 0.5, label = 'nadir')
+
+    
+    for key in list(keys):
+        if dimension == 'area':
+            if variable == 'month3_emplvl':
+                y = recession.area_empl['area_fips'[key]]
+            if variable == 'avg_wkly_wage':
+                y = recession.area_wage['area_fips'[key]]
+            if variable == 'qtrly_estabs_count':
+                y = recession.area_firm['area_fips'[key]]
+        if dimension == 'industry':
+            if variable == 'month3_emplvl':
+                y = recession.indus_empl['area_fips'[key]]
+            if variable == 'avg_wkly_wage':
+                y = recession.indus_wage['area_fips'[key]]
+            if variable == 'qtrly_estabs_count':
+                y = recession.indus_firm['area_fips'[key]]
+
+    def plot_2001(self):
+        y = self.y_2001
+        ax.plot(x,y, color = 'green', linewidth = 1, alpha = 0.8)
+        ax.axhline(y = self.nadir_2001, xmin = 'Q1 2000', xmax = 'Q4 2007', 
+                    color = 'red', linewidth = .5, alpha = 0.5, label = 'nadir')
+        ax.axhline(y = self.pre_peak_2001, xmin = 'Q1 2000', xmax = 'Q4 2007',
+                    color = 'blue', linewidth = .5, alpha = .5, label = 'pre-recession-peak')
+        
+        ax.axvline(x = 'Q3 2001', color = 'black', linewidth = 0.5, alpha = 0.5, label = '09/11/2001')
+        ax.legend(fancybox = True, borderaxespad=0)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.savefig('src/static/images/plot_2001.png')
+        return fig, ax
+
+        !event_quarter : float
+        quarter in which the recession event takes place
+    !event_label : str
+        read-friendly description of recession event
+    
+    !x : list
+        list of relevant quarters to use as an X-axis
+
+    !y_end : int
+        number of columns to chart

@@ -55,10 +55,14 @@ class Recession(object):
         year in which recession event takes place
     event_quarter : float
         quarter in which recession event takes place
+    event_label : str
+        read-friendly description of recession event
     quarters : list
         list of quarters included in recession analysis
     xaxis : list
         list of reader-friendly quarters in recession analys
+    import_schema :
+        
 
 
     Methods
@@ -82,6 +86,7 @@ class Recession(object):
         self.event_label = events_display[year]
         self.quarters = [quarter for quarter in quarters_display.keys() if quarter >= min(self.years) and quarter <= (max(self.years) + 1)]
         self.xaxis = [v for k,v in quarters_display.items() if k in self.quarters]
+        self.y_end = end_columns[year]
 
 
 
