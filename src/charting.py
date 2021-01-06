@@ -118,13 +118,13 @@ class Vector(object):
         self.y = np.array(df.loc[key][1:self.recession.y_end], dtype=float)
         self.label = df[self.index_title].loc[key]
         self.nadir = df['nadir'].loc[key]
-        self.nadir_qtr = df['nadir_qtr'].loc[key] / 4 + self.recession.years[0]
+        self.nadir_qtr = df['nadir_qtr'].loc[key] 
         self.pre_peak = df['pre_peak'].loc[key]
-        self.pre_peak_qtr = df['pre_peak_qtr'].loc[key] / 4 + self.recession.years[0]
+        self.pre_peak_qtr = df['pre_peak_qtr'].loc[key]
         self.post_peak = df['post_peak'].loc[key]
-        self.post_peak_qtr = df['post_peak_qtr'].loc[key] / 4 + self.recession.years[0]
+        self.post_peak_qtr = df['post_peak_qtr'].loc[key] 
         self.recovery = df['recovery'].loc[key]
-        self.recovery_qtr = (df['nadir_qtr'].loc[key] + df['recovery_qtr'].loc[key]) / 4 + self.recession.years[0]
+        self.recovery_qtr = df['recovery_qtr'].loc[key] 
         self.decline = df['decline'].loc[key]
         self.delta = df['delta'].loc[key]
 
