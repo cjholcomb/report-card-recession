@@ -166,13 +166,13 @@ class Vector(object):
             nadir = x.index(quarters_display[self.nadir_qtr])
             
             #color the decline, recovery, and growth
-            ax.fill_between(x=xi, y1=y, y2=y2, color='red', alpha=0.1, label='Decline', where=(xi >= pre_peak) & (xi <= nadir))
+            ax.fill_between(x=xi, y1=y, y2=y2, color='red', alpha=0.1, label='Decline', interpolate = True, where=(xi >= pre_peak) & (xi <= nadir))
             if self.recovery:
                 recovery = x.index(quarters_display[self.recovery_qtr])
-                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery', where=(xi >= nadir) & (xi <= recovery))
-                ax.fill_between(x=xi, y1=y, y2=y2, color='green', alpha=0.1, label='Growth', where=(xi >= recovery))
+                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery', interpolate = True,  where=(xi >= nadir) & (xi <= recovery))
+                ax.fill_between(x=xi, y1=y, y2=y2, color='green', alpha=0.1, label='Growth', interpolate = True, where=(xi >= recovery))
             else:
-                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery (incomplete)', where=(xi >= nadir))
+                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery (incomplete)', interpolate = True, where=(xi >= nadir))
             
         #define the title
         title = str(self.recession.event_year) + ' Recession: ' + self.label

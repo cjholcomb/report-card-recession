@@ -31,7 +31,7 @@ def filepath(variable = 'month3_emplvl', dimension = 'area', charttype = 'basic'
             filetype (str): determines what type of file will be saved/loaded. Must be one of ['json', 'csv']. Use 'csv' for loading raw QCEW files.
 
         Returns:
-            df (pandas dataframe): dataframe with column added
+            filepath (str): path to load appropriate file
     '''
     filename = dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + "." + filetype 
     filepath = "data/timelines/" + charttype + "/" + dimension + "/" + var_abbr[variable] + '/' +  filename 
