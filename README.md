@@ -4,11 +4,11 @@
                 <p>While modeling the recovery from the 2020 COVID-19 recession was the initial goal, I have expanded the scope to include making a scalable, reusable library for working with QCEW data.</p>
     <h2>Project Goals</h2>
                     <ol type = "1">
-                        <li>Develop an object-oriented module to define parameters of recessions, industries, and areas.</li>
-                        <li>Expand parameters of the dataframe construction module to allow for automated construction of a timeline on any recession across any dimension(industry, area) or target variable (employment, wages, or firms).</li>
-                        <li>Develop a module to automate charting of timelines.</li>
+                        <li>Develop an object-oriented module to define parameters of recessions, industries, and areas. (COMPLETE)</li>
+                        <li>Expand parameters of the dataframe construction module to allow for automated construction of a timeline on any recession across any dimension(industry, area) or target variable (employment, wages, or firms). (COMPLETE)</li>
+                        <li>Develop a module to automate charting of timelines. (COMPLETE)</li>
                         <li>Automate adjustment of NAICS industry classification changes into the timeline data and ensure consistency across recession timelines.</li>
-                        <li>Develop a version of the "scariest chart", automated to include any dimension, variable, or recession.</li>
+                        <li>Develop a version of the "scariest chart", automated to include any dimension, variable, or recession. (COMPLETE)</li>
                         <li>Update the Flask interface to include new charts and features.</li>
                         <li>Create an AWS instance to allow others to run report cards on areas or industries.</li>
                         <li>Expand data collection to include political, fiscal, and population data for areas.</li>
@@ -95,15 +95,24 @@
         <h3>Derived Variables:</h3>
                 <p>The below variables are computed based on the recession timelines</p>
                     <ul>
-                        <li>nadir: The low point in the timeline. Excludes the first seven columns when computing.</li>
-                        <li>nadir_qtr: The number of quarters (from the beginning of the timeline) until the nadir.</li>
                         <li>pre-peak: The high point of the timeline <i>before</i> the nadir.</li>
-                        <li>pre_peak_qtr: The number of quarters (from the beginning of the timeline) until the pre-peak.</li>
+                        <li>pre_peak_time: The number of quarters (from the beginning of the timeline) until the pre-peak.</li> 
+                        <li>pre_peak_qtr: The quarter at which the pre-peak occurs.</li> 
+                        <li>decline_time: the number of quarters between the pre-peak and the nadir.</li>
+                        <br>
+                        <li>nadir: The low point in the timeline. Excludes the first seven columns when computing.</li>
+                        <li>nadir_time: The number of quarters (from the beginning of the timeline) until the nadir.</li>
+                        <li>nadir_qtr: The quarter at which the nadir occurs.</li> 
+                        <br>
+                        <li>recovery: Whether or not the timeline recovers from the recession before the end of the timeline (Is post-peak >= pre-peak). 
+                        <li>recovery_time: the number of quarters between the nadir and when the timeline surpasses the pre-peak. Will be NaN if recovery == 0.
+                        <li>recovery_qtr: The quarter at which the recovery occurs.</li> 
+                        <br>
                         <li>post-peak: The high point of the timeline <i>after</i> the nadir.</li>
                         <li>post_peak_qtr: The number of quarters (from the nadir) until the post-peak.</li>
-                        <li>recovery: Whether or not the timeline recovers from the recession before the end of the timeline (Is post-peak >= pre-peak). 
-                        <li>recovery_qtr: the number of quarters between the nadir and when the timeline surpasses the pre-peak. Will be NaN if recovery == 0.
-                        <li>decline: the number of quarters between the pre-peak and the nadir.
+                        <li>post_peak_qtr: The quarter at which the post-peak occurs.</li>
+                        <li>growth_time: the number of quarters between the recovery and the post-peak.</li>
+                        <br>
                         <li>delta: the difference between pre-peak and post-peak.
                     </ul>
     <h2>3. Timeline Charting: The Vector Class</h2>
