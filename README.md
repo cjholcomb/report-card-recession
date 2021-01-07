@@ -7,7 +7,10 @@
                         <li>Develop an object-oriented module to define parameters of recessions, industries, and areas. (COMPLETE)</li>
                         <li>Expand parameters of the dataframe construction module to allow for automated construction of a timeline on any recession across any dimension(industry, area) or target variable (employment, wages, or firms). (COMPLETE)</li>
                         <li>Develop a module to automate charting of timelines. (COMPLETE)</li>
-                        <li>Automate adjustment of NAICS industry classification changes into the timeline data and ensure consistency across recession timelines.</li>
+                        <li>Automate adjustment of NAICS industry classification changes into the timeline data and ensure consistency across recession timelines. (DEFERRED)</li>
+                            <ul style="list-style-type:none;">
+                                <li>- As the neural network models will not be affected by these changes, the amount of effort vs. the benefit to a user pulling up a report on one of the few industries affected. Will be revisited later.</li>
+                            </ul>
                         <li>Develop a version of the "scariest chart", automated to include any dimension, variable, or recession. (COMPLETE)</li>
                         <li>Update the Flask interface to include new charts and features.</li>
                         <li>Create an AWS instance to allow others to run report cards on areas or industries.</li>
