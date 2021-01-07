@@ -4,20 +4,11 @@ import numpy as np
 from recessions import *
 from industries import industry_titles
 
-#lists of variables to drop during timeline construction
-dropcols_str = {2001:['2000.25', '2000.5', '2000.75', '2001.0', '2001.25', '2001.5', '2001.75', '2002.0', '2002.25', '2002.5', '2002.75', '2003.0', '2003.25', '2003.5', '2003.75', '2004.0', '2004.25', '2004.5', '2004.75', '2005.0', '2005.25', '2005.5', '2005.75', '2006.0', '2006.25', '2006.5', '2006.75', '2007.0', '2007.25', '2007.5', '2007.75', '2008.0', 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak','pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list'],
-2008:['2007.25', '2007.5', '2007.75', '2008.0', '2008.25', '2008.5', '2008.75', '2009.0', '2009.25', '2009.5', '2009.75', '2010.0', '2010.25', '2010.5', '2010.75', '2011.0', '2011.25', '2011.5', '2011.75', '2012.0', '2012.25', '2012.5', '2012.75', '2013.0', '2013.25', '2013.5', '2013.75', '2014.0', '2014.25', '2014.5', '2014.75', '2015.0', '2015.25', '2015.5', '2015.75', '2016.0', '2016.25', '2016.5', '2016.75', '2017.0', '2017.25', '2017.5', '2017.75', '2018.0', '2018.25', '2018.5', '2018.75', '2019.0', '2019.25', '2019.5', '2019.75', '2020.0', 'nadir', 'nadir_qtr', 'nadir_time', 'new', 'pre_peak', 'post_peak',  'pre_peak_qtr', 'pre_peak_time', 'post_peak_qtr', 'post_peak_time' 'recovery', 'recovery_list'],
-'full':['2000.25', '2000.5', '2000.75', '2001.0', '2001.25', '2001.5', '2001.75', '2002.0', '2002.25', '2002.5', '2002.75', '2003.0', '2003.25', '2003.5', '2003.75', '2004.0', '2004.25', '2004.5', '2004.75', '2005.0', '2005.25', '2005.5', '2005.75', '2006.0', '2006.25', '2006.5', '2006.75', '2007.0', '2007.25', '2007.5', '2007.75', '2008.0', '2008.25', '2008.5', '2008.75', '2009.0', '2009.25', '2009.5', '2009.75', '2010.0', '2010.25', '2010.5', '2010.75', '2011.0', '2011.25', '2011.5', '2011.75', '2012.0', '2012.25', '2012.5', '2012.75', '2013.0', '2013.25', '2013.5', '2013.75', '2014.0', '2014.25', '2014.5', '2014.75', '2015.0', '2015.25', '2015.5', '2015.75', '2016.0', '2016.25', '2016.5', '2016.75', '2017.0', '2017.25', '2017.5', '2017.75', '2018.0', '2018.25', '2018.5', '2018.75', '2019.0', '2019.25', '2019.5', '2019.75', '2020.0', 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak','pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list']}
-dropcols_flt = {2001:[2000.25, 2000.5, 2000.75, 2001.0, 2001.25, 2001.5, 2001.75, 2002.0, 2002.25, 2002.5, 2002.75, 2003.0, 2003.25, 2003.5, 2003.75, 2004.0, 2004.25, 2004.5, 2004.75, 2005.0, 2005.25, 2005.5, 2005.75, 2006.0, 2006.25, 2006.5, 2006.75, 2007.0, 2007.25, 2007.5, 2007.75, 2008.0, 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak', 'pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list'],
-2008:[2007.25, 2007.5, 2007.75, 2008.0, 2008.25, 2008.5, 2008.75, 2009.0, 2009.25, 2009.5, 2009.75, 2010.0, 2010.25, 2010.5, 2010.75, 2011.0, 2011.25, 2011.5, 2011.75, 2012.0, 2012.25, 2012.5, 2012.75, 2013.0, 2013.25, 2013.5, 2013.75, 2014.0, 2014.25, 2014.5, 2014.75, 2015.0, 2015.25, 2015.5, 2015.75, 2016.0, 2016.25, 2016.5, 2016.75, 2017.0, 2017.25, 2017.5, 2017.75, 2018.0, 2018.25, 2018.5, 2018.75, 2019.0, 2019.25, 2019.5, 2019.75, 2020.0, 'nadir', 'nadir_qtr', 'nadir_time', 'new', 'pre_peak', 'post_peak',  'pre_peak_qtr', 'pre_peak_time', 'post_peak_qtr', 'post_peak_time' 'recovery', 'recovery_list'],
-'full':[2000.25, 2000.5, 2000.75, 2001.0, 2001.25, 2001.5, 2001.75, 2002.0, 2002.25, 2002.5, 2002.75, 2003.0, 2003.25, 2003.5, 2003.75, 2004.0, 2004.25, 2004.5, 2004.75, 2005.0, 2005.25, 2005.5, 2005.75, 2006.0, 2006.25, 2006.5, 2006.75, 2007.0, 2007.25, 2007.5, 2007.75, 2008.0, 2008.25, 2008.5, 2008.75, 2009.0, 2009.25, 2009.5, 2009.75, 2010.0, 2010.25, 2010.5, 2010.75, 2011.0, 2011.25, 2011.5, 2011.75, 2012.0, 2012.25, 2012.5, 2012.75, 2013.0, 2013.25, 2013.5, 2013.75, 2014.0, 2014.25, 2014.5, 2014.75, 2015.0, 2015.25, 2015.5, 2015.75, 2016.0, 2016.25, 2016.5, 2016.75, 2017.0, 2017.25, 2017.5, 2017.75, 2018.0, 2018.25, 2018.5, 2018.75, 2019.0, 2019.25, 2019.5, 2019.75, 2020.0, 'nadir', 'nadir_qtr', 'new', 'pre_peak', 'post_peak', 'pre_peak_qtr', 'post_peak_qtr', 'recovery', 'recovery_list']}
-
 #schema for importing dataframe
 schema_dict = { 'area_fips':str,  'own_code':str,  'industry_code':str,  'agglvl_code':str,  'size_code':str,  'year':int,  'qtr':int,  'disclosure_code':str, 'area_title':str,  'own_title':str,  'industry_title':str,  'agglvl_title':str,  'size_title':str,  'qtrly_estabs':int,  'month1_emplvl':int,  'month2_emplvl':int,  'month3_emplvl':int,  'total_qtrly_wages':int,  'taxable_qtrly_wages':int,  'qtrly_contributions':int,  'avg_wkly_wage':int,  'lq_disclosure_code':str,  'lq_qtrly_estabs':float,  'lq_month1_emplvl':float,  'lq_month1_emplv2':float,  'lq_month1_emplv3':float,  'lq_total_qtrly_wages':float,  'lq_taxable_qtrly_wages':float,  'lq_qrtly_contributions':float,  'oty_disclosure_code':str,  'oty_qtrly_estabs':int,  'oty_qtrly_estabs_pct_chg':float,  'oty_month1_emplvl_chg':int,  'oty_month1_emplvl_pct_chg':float,  'oty_month2_emplv_chg':int,  'oty_month2_emplvl_pct_chg':float,  'oty_month3_emplvl_chg':int,  'oty_month3_emplvl_pct_chg':float,  'oty_total_qtrly_wages_chg':int,  'oty_total_qtrly_wages_pct_chg':float,  'oty_taxable_qtrly_wages_chg':int,  'oty_taxable_qtrly_wages_pct_chg':float,  'oty_qrtly_contributions_chg':int,  'oty_qrtly_contributions_pct_chg':float,  'oty_avg_wkly_wage_chg':int,  'oty_avg_wkly_wage_pct_chg':float} 
 
 #unused columns from QCEW
-drop_columns = ['own_code',  'size_code',  'disclosure_code',  'own_title',  'size_title',  'lq_disclosure_code', 'oty_disclosure_code',  'oty_month1_emplvl_chg',  'oty_month2_emplvl_chg',  'oty_month3_emplvl_chg',  'oty_total_qtrly_wages_chg',  'oty_taxable_qtrly_wages_chg',  'oty_qtrly_contributions_chg',  'oty_avg_wkly_wage_chg',  'lq_qtrly_estabs_count',  'lq_month1_emplvl',  'lq_month2_emplvl',  'lq_month3_emplvl',  'lq_total_qtrly_wages',  'lq_taxable_qtrly_wages',  'lq_qtrly_contributions',  'oty_qtrly_estabs_count_chg',  'oty_qtrly_estabs_count_pct_chg',  'oty_month1_emplvl_pct',  'oty_month2_emplvl_pct',  'oty_month3_emplvl_pct',  'oty_total_qtrly_wages_pct',  'oty_taxable_qtrly_wages_chg',  'oty_qtrly_contributions_pct',  'oty_avg_wkly_wage_pct',  'oty_taxable_qtrly_wages_chg.1',  'lq_avg_wkly_wage',  'taxable_qtrly_wages',  'qtrly_contributions']
-
+import_drop = ['own_code',  'size_code',  'disclosure_code',  'own_title',  'size_title',  'lq_disclosure_code', 'oty_disclosure_code',  'oty_month1_emplvl_chg',  'oty_month2_emplvl_chg',  'oty_month3_emplvl_chg',  'oty_total_qtrly_wages_chg',  'oty_taxable_qtrly_wages_chg',  'oty_qtrly_contributions_chg',  'oty_avg_wkly_wage_chg',  'lq_qtrly_estabs_count',  'lq_month1_emplvl',  'lq_month2_emplvl',  'lq_month3_emplvl',  'lq_total_qtrly_wages',  'lq_taxable_qtrly_wages',  'lq_qtrly_contributions',  'oty_qtrly_estabs_count_chg',  'oty_qtrly_estabs_count_pct_chg',  'oty_month1_emplvl_pct',  'oty_month2_emplvl_pct',  'oty_month3_emplvl_pct',  'oty_total_qtrly_wages_pct',  'oty_taxable_qtrly_wages_chg',  'oty_qtrly_contributions_pct',  'oty_avg_wkly_wage_pct',  'oty_taxable_qtrly_wages_chg.1',  'lq_avg_wkly_wage',  'taxable_qtrly_wages',  'qtrly_contributions']
 
 def filepath(variable = 'month3_emplvl', dimension = 'area', charttype = 'basic', recession = 2001, filetype = 'json'):
     '''
@@ -35,6 +26,7 @@ def filepath(variable = 'month3_emplvl', dimension = 'area', charttype = 'basic'
     '''
     filename = dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + "." + filetype 
     filepath = "data/timelines/" + charttype + "/" + dimension + "/" + var_abbr[variable] + '/' +  filename 
+    # print(filepath)
     return filepath
 
 def add_qtrid(df):
@@ -68,7 +60,7 @@ def import_one(year, dimension = 'area'):
     if dimension == 'industry':
         df = df[df.own_code != 8]
         df = df[df.own_code != 9]
-    for column in drop_columns:
+    for column in import_drop:
         if column in df.columns:
             df = df.drop([column], axis = 1)
     #removes industry columns from area data
@@ -161,11 +153,14 @@ def target_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
         exported json file
     '''
 
+    #exits if recession isn't valid
     if recession == 'full':
         pass
 
+    #instantiates a Recession object
     recession = Recession(recession)
     
+    #loads the json file if indicated, otherwise calls the basic function to produce the initial timeline
     if loadjson:
         loadpath = filepath(variable = variable, dimension = dimension, charttype= 'basic', recession = recession.event_year, filetype = 'json')
         # filepath =  "data/timelines/basic/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json"
@@ -173,27 +168,28 @@ def target_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
     else:
         df = basic_timeline(variable = variable, dimension = dimension, recession = recession.event_year, save = save)
     
+    #creates a list to store index fields
     if dimension == 'area':
         df = df[~df['area_fips'].str.contains("999")]
         index = ['area_fips', 'area_title']
     elif dimension == 'industry':
         index = ['industry_code', 'industry_title']
 
-
     #creates a secondary dataframe with only timeline variables
     df2 = df.drop(columns = index)
     df2 = df2.reset_index()
     
-    #drops the index so that all columns are free of any type mismatches
+    #drops the index fields so that all columns are free of any type mismatches
     df2 = df2.drop(columns = 'index')
     df2 = df2.fillna(0)
 
     #specifies the lowest numbers during the recession. Disregards quarters before the recession event. 
     df2['nadir'] = df2.iloc[:,6:].min(axis=1)
 
-    #specifies which quarter the nadir occured.
+    #specifies how many quarters it took before the nadir occured
     df2['nadir_time'] = (df2.iloc[:,6:].idxmin(axis=1).apply(lambda x: df.columns.get_loc(x)))-1
     
+    #specifies which quarter the nadir occured.
     df2['nadir_qtr'] =  df2['nadir_time'] / 4 + recession.years[0]
     
     #creates a column to store indices for lookup.
@@ -205,11 +201,12 @@ def target_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
     #specifies the highest numbers *after* the nadir
     df2['post_peak'] = df2.apply(lambda x: max(x['new'][x['nadir_time']:]), axis=1) 
     
-    #specifies which quarter the pre-peak occurred.
+    #specifies how many quarters it took before the pre-peak occurred.
     df2['pre_peak_time'] = pd.Series([s[i] for i, s in zip(df2.index, df2['pre_peak'].apply(
         lambda x: [i for i in (df2.iloc[:,0:-6] == x)
                 .idxmax(axis=1)]))]).apply(lambda x: df2.columns.get_loc(x)) + 1
     
+    #specifies which quarter the pre-peak occurred.
     df2['pre_peak_qtr'] = df2['pre_peak_time'] / 4 + recession.years[0]
 
     #specifies which quarter the post-peak occurred.
@@ -233,15 +230,11 @@ def target_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
 
     df3['recovery_qtr'] = (df3['nadir_time'] + df3['recovery_time']) / 4 + recession.years[0]
 
-    #drops all redunant fields from the third dataframe
-    if loadjson:
-        df3 = df3.drop(columns = dropcols_str[recession.event_year])
-    else:
-        df3 = df3.drop(columns = dropcols_flt[recession.event_year])
+    df3 = df3.reindex(columns = ['recovery_time', 'recovery_qtr'])
 
     #creates a new dataframe to store derived fields
     df_new = df2[['nadir', 'nadir_qtr', 'nadir_time', 'pre_peak', 'pre_peak_time', 'pre_peak_qtr', 'post_peak', 'post_peak_time', 'post_peak_qtr', 'recovery']]
-
+    
     #adds the recovery quarter column from the third dataframe
     df_new = df_new.join(df3, how = 'left', rsuffix = '_recov')
 
@@ -255,30 +248,17 @@ def target_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 
     
     #Different in before/after jobs numbers
     df['delta'] = df['post_peak'] - df['pre_peak']
-
-    #remove extra columns
-    df.drop(columns = ['nadir_time_recov', 'pre_peak_time_recov', 'post_peak_time_recov'], inplace = True)
     
-    df = df['area_fips', 'area_title', 2000.25, 2000.5, 2000.75, 2001.0,          2001.25,           2001.5,
-                2001.75,           2002.0,          2002.25,           2002.5,
-                2002.75,           2003.0,          2003.25,           2003.5,
-                2003.75,           2004.0,          2004.25,           2004.5,
-                2004.75,           2005.0,          2005.25,           2005.5,
-                2005.75,           2006.0,          2006.25,           2006.5,
-                2006.75,           2007.0,          2007.25,           2007.5,
-                2007.75,           2008.0,          'nadir',      'nadir_qtr',
-           'nadir_time',       'pre_peak',  'pre_peak_time',   'pre_peak_qtr',
-            'post_peak', 'post_peak_time',  'post_peak_qtr',       'recovery',
-        'recovery_time',   'recovery_qtr',   'decline_time',    'growth_time',
-                'delta'],
-      dtype='object', name='qtrid')
-
+    #reorders columns for easier organization
+    col_order = index
+    col_order.extend(recession.quarters)
+    col_order.extend(['pre_peak', 'nadir', 'post_peak', 'recovery', 'delta', 'pre_peak_time', 'decline_time', 'nadir_time', 'recovery_time', 'post_peak_time', 'growth_time', 'pre_peak_qtr', 'nadir_qtr', 'recovery_qtr', 'post_peak_qtr'])
+    
     #export the data
     if save:
         savepath = filepath(variable = variable, dimension = dimension, charttype= 'target', recession = recession.event_year, filetype = 'json')
         df.to_json(savepath)
     return df
-
 
 def proportional_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 2001, save = False):
     '''
@@ -299,10 +279,11 @@ def proportional_timeline(variable = 'month3_emplvl', dimension = 'area', recess
 
     if recession == 'full':
         pass
+    recession = Recession(recession)
     # filepath =  "data/timelines/targets/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json" 
-    loadpath = filepath(variable = variable, dimension = dimension, charttype= 'target', recession = recession, filetype = 'json')
+    loadpath = filepath(variable = variable, dimension = dimension, charttype= 'target', recession = recession.event_year, filetype = 'json')
     df = pd.read_json(loadpath)
-    df = df.drop(columns =  ['nadir', 'nadir_qtr', 'pre_peak_qtr', 'post_peak', 'post_peak_qtr', 'recovery', 'recovery_qtr', 'decline', 'delta'])
+    df = df.drop(columns =  ['nadir', 'post_peak', 'recovery', 'delta', 'pre_peak_time', 'decline_time', 'nadir_time', 'post_peak_time', 'recovery_time', 'growth_time', 'pre_peak_qtr', 'nadir_qtr', 'recovery_qtr', 'post_peak_qtr'])
     count = -6
     drop_list = ['pre_peak']
     for column in df.columns [2:-1]:
@@ -312,7 +293,7 @@ def proportional_timeline(variable = 'month3_emplvl', dimension = 'area', recess
     df.drop(columns = drop_list, inplace= True)
     if save:
         # savepath =  "data/timelines/proportional/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json"
-        savepath = filepath(variable = variable, dimension = dimension, charttype= 'proportional', recession = recession, filetype = 'json')
+        savepath = filepath(variable = variable, dimension = dimension, charttype= 'proportional', recession = recession.event_year, filetype = 'json')
         df.to_json(savepath) 
     return df
 

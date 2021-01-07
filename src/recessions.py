@@ -64,7 +64,7 @@ class Recession(object):
         self.event_year = year
         self.event_quarter = recession_events[year]
         self.event_label = events_display[year]
-        self.quarters = [quarter for quarter in quarters_display.keys() if quarter >= min(self.years) and quarter <= (max(self.years) + 1)]
+        self.quarters = [quarter for quarter in quarters_display.keys() if quarter > min(self.years) and quarter <= (max(self.years) + 1)]
         self.xaxis = [v for k,v in quarters_display.items() if k in self.quarters]
         self.y_end = end_columns[year]
 
