@@ -42,26 +42,36 @@ class Vector(object):
         datapoints to plot on the chart 
     label : str
         reader-friendly title for the chart
-    nadir : float
-        low point in the timeline. Excludes the first seven columns when computing.</li>
-    nadir_qtr : float
-        number of quarters (from the beginning of the timeline) until the nadir.</li>
     pre-peak : float
-        high point of the timeline before the nadir.
-    pre_peak_qtr : int
-        number of quarters (from the beginning of the timeline) until the pre-peak.</li>
+        high point of the timeline before the nadir. 
+    nadir : float
+        low point in the timeline. Excludes the first seven columns when computing.   
     post-peak : float
         high point of the timeline after the nadir.
-    post_peak_qtr : float
-        number of quarters (from the nadir) until the post-peak.
     recovery : bool
         pre_peak <= post_peak
-    recovery_qtr : float, will be NaN if pre_peak < post_peak
-        number of quarters between the andir and when the timeline surpasses the pre-peak. Will be NaN if recovery == 0.
-    decline : int
-        number of quarters between the pre-peak and the nadir.
     delta : float
-        difference between pre-peak and post-peak.  
+        difference between pre-peak and post-peak. 
+    pre_peak_time : int
+        number of quarters (from the beginning of the timeline) until the pre-peak.
+    decline_time : int
+        number of quarters between the pre-peak and the nadir.
+    nadir_time : int
+        number of quarters (from the beginning of the timeline) until the nadir.
+    recovery_time : int, will be NaN if pre_peak < post_peak
+        number of quarters between the andir and when the timeline surpasses the pre-peak. Will be NaN if recovery == 0.
+    post_peak_time : int
+        number of quarters (from the nadir) until the post-peak.
+    growth_time : int, will be NaN if pre_peak < post_peak
+        number of quarters between the recovery quarter and the post-peak
+    pre_peak_qtr : str
+        Highest quarter before the nadir
+    nadir_qtr : str
+        Lowest quarter of the timeline
+    recovery_qtr : str, will be NaN if pre_peak < post_peak
+        quarter after nadir at which the pre-peak is surpassed
+    post_peak_qtr : str
+        Highest quarter after the nadir
     
     Methods
     -------
@@ -98,9 +108,8 @@ class Vector(object):
         self.recession = Recession(recession)
         self.dimension = dimension
         self.variable = variable
-        loadpath = filepath(recession = recession, dimension = dimension , variable = variable, charttype = 'target')
-        # filepath =  "data/timelines_w_targets/" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json" 
-        # self.y_end = end_columns[recession]
+        
+        loadpath = filepath(variable = variable, dimension = dimension, charttype= 'target', recession = self.recession.event_year, filetype = 'json')
         df = pd.read_json(loadpath)
         if dimension == 'industry':
             self.index_col = 'industry_code'
@@ -111,31 +120,40 @@ class Vector(object):
             self.index_title = 'area_title'
             self.row = Area(key)
         df = df.set_index(self.index_col)
+        
         self.df = df
-        # self.event_quarter = recession_events[recession]
-        # self.event_label = events_display[recession]
-        # self.x = self.recession.xaxis
         self.y = np.array(df.loc[key][1:self.recession.y_end], dtype=float)
         self.label = df[self.index_title].loc[key]
-        self.nadir = df['nadir'].loc[key]
-        self.nadir_qtr = df['nadir_qtr'].loc[key] / 4 + self.recession.years[0]
+        
         self.pre_peak = df['pre_peak'].loc[key]
-        self.pre_peak_qtr = df['pre_peak_qtr'].loc[key] / 4 + self.recession.years[0]
-        self.post_peak = df['post_peak'].loc[key]
-        self.post_peak_qtr = df['post_peak_qtr'].loc[key] / 4 + self.recession.years[0]
+        self.nadir = df['nadir'].loc[key]
         self.recovery = df['recovery'].loc[key]
-        self.recovery_qtr = (df['nadir_qtr'].loc[key] + df['recovery_qtr'].loc[key]) / 4 + self.recession.years[0]
-        self.decline = df['decline'].loc[key]
+        self.post_peak = df['post_peak'].loc[key]
         self.delta = df['delta'].loc[key]
 
-    def plot_single(self, colorcode = True):
+        self.pre_peak_time = df['pre_peak_time'].loc[key]
+        self.decline_time = df['decline_time'].loc[key]
+        self.nadir_time = df['nadir_time'].loc[key] 
+        self.recovery_time = df['recovery_time'].loc[key]
+        self.growth_time = df['growth_time'].loc[key]
+        self.post_peak_time = df['post_peak_time'].loc[key]
+        
+        if self.recovery:
+            self.recovery_qtr = quarters_display[df['recovery_qtr'].loc[key]]
+        self.nadir_qtr = quarters_display[df['nadir_qtr'].loc[key]] 
+        self.pre_peak_qtr = quarters_display[df['pre_peak_qtr'].loc[key]]
+        self.post_peak_qtr = quarters_display[df['post_peak_qtr'].loc[key]]
+
+    def plot_single(self, colorcode = True, check = False):
         """
         Plots the vector by itself.
 
         Parameters
         ----------
-            colorcode : bool
+            colorcode : bool (default True)
                 Determines if decline, recovery, and growth sections will be highlighted on the graph
+            check : bool (default False)
+                Determines if all important points will be charted. Used for troubleshooting.
 
         Returns
         -------
@@ -145,34 +163,36 @@ class Vector(object):
         x = self.recession.xaxis
         xi = np.arange(len(self.recession.xaxis))
         y = self.y
-        recession_event = quarters_display[self.recession.event_quarter]
-        event_label = self.recession.event_label
-        x_decline = (quarters_display[self.nadir_qtr], quarters_display[self.recovery_qtr])
-        y1_decline = self.nadir
-        y2_decline = self.pre_peak
-
+        y2 = self.pre_peak
 
         #plot the vector
         ax.plot(x, y, color = 'navy', linewidth = 2, alpha = 0.8, label = None)
         
         #plot the recession event
-        ax.axvline(x = recession_event, color = 'black', linewidth = 1, alpha = .8, label = event_label, linestyle = '--')
+        ax.axvline(x = quarters_display[self.recession.event_quarter], color = 'black', linewidth = 1, alpha = .8, label = self.recession.event_label, linestyle = '--')
+        ax.axhline(y = self.pre_peak, color = 'black', linewidth = 1, alpha = .8, label = 'Pre-peak: ' + self.pre_peak_qtr + ' (' + '{:,}'.format(self.pre_peak) +')', linestyle = '--')
         
+        if check:
+            ax.axvline(x = self.pre_peak_qtr, color = 'navy', linewidth = 1, alpha = .8, label = 'Pre-peak', linestyle = ':')
+            ax.axvline(x = self.nadir_qtr, color = 'red', linewidth = 1, alpha = .8, label = 'Nadir', linestyle = ':')
+            ax.axvline(x = self.post_peak_qtr, color = 'green', linewidth = 1, alpha = .8, label = 'Post-peak', linestyle = ':')
+            ax.axhline(y = self.nadir, color = 'red', linewidth = 1, alpha = .8, linestyle = ':')
+            ax.axhline(y = self.post_peak, color = 'green', linewidth = 1, alpha = .8, linestyle = ':')
+            if self.recovery:
+                ax.axvline(x = self.recovery_qtr, color = 'gold', linewidth = 1, alpha = .8, label = 'Recovery', linestyle = ':')
+
         if colorcode:
-            x = self.recession.xaxis
-            y = self.y
-            y2 = self.pre_peak
-            pre_peak = x.index(quarters_display[self.pre_peak_qtr])
-            nadir = x.index(quarters_display[self.nadir_qtr])
+            pre_peak = x.index(self.pre_peak_qtr)
+            nadir = x.index(self.nadir_qtr)
             
             #color the decline, recovery, and growth
-            ax.fill_between(x=xi, y1=y, y2=y2, color='red', alpha=0.1, label='Decline', interpolate = True, where=(xi >= pre_peak) & (xi <= nadir))
+            ax.fill_between(x=xi, y1=y, y2=y2, color='red', alpha=0.1, label='Decline', where=(xi >= pre_peak) & (xi <= nadir))
             if self.recovery:
-                recovery = x.index(quarters_display[self.recovery_qtr])
-                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery', interpolate = True,  where=(xi >= nadir) & (xi <= recovery))
-                ax.fill_between(x=xi, y1=y, y2=y2, color='green', alpha=0.1, label='Growth', interpolate = True, where=(xi >= recovery))
+                recovery = x.index(self.recovery_qtr)
+                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery', where=(xi >= nadir) & (xi <= recovery))
+                ax.fill_between(x=xi, y1=y, y2=y2, color='green', alpha=0.1, label='Growth', interpolate = True, where=(xi >= recovery) & (y >= y2))
             else:
-                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery (incomplete)', interpolate = True, where=(xi >= nadir))
+                ax.fill_between(x=xi, y1=y, y2=y2, color='gold', alpha=0.1, label='Recovery (incomplete)', where=(xi >= nadir))
             
         #define the title
         title = str(self.recession.event_year) + ' Recession: ' + self.label
@@ -181,7 +201,7 @@ class Vector(object):
         #set remaining chart properties and show
         ax.tick_params(axis='both', which='major', labelsize=10)
         ax.tick_params(axis='both', which='minor', labelsize=10)
-        ax.ticklabel_format(style = 'plain', axis = 'y', scilimits = (9, -1)) 
+        # ax.ticklabel_format(style = 'plain', axis = 'y', scilimits = (9, -1)) 
         ax.get_yaxis().set_major_formatter(mtick.FuncFormatter(lambda x, p: format(int(x), ',')))
         ax.legend(fancybox = True, borderaxespad=0)
         plt.xticks(rotation=45)

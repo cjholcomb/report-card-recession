@@ -95,6 +95,8 @@ class Industry(object):
         codes of industries directly below in the hierarchy
     siblings : list
         codes of industries that share a parent industry
+    orphan : bool
+        inidcates if industry is idnentical to parent (no siblings)
 
     Methods
     -------
@@ -121,10 +123,15 @@ class Industry(object):
             self.children = []
         else:
             self.children = child_industries[code]
+        
         if code == 10:
-            self.siblings = []
+            self.siblings = [10]
+            self.orphan = True
         else:
             self.siblings = sibling_industries[code]
+            self.orphan = len(self.siblings) == 1
+                
+
 
     def derive_generation(self, code):
         """
