@@ -4,11 +4,11 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-from produce_datasets import filepath
+from src.produce_datasets import filepath
 
-from recessions import *
-from areas import *
-from industries import *
+from src.recessions import *
+from src.areas import *
+from src.industries import *
 
 var_display ={'month3_emplvl': 'Total Employment', 'avg_wkly_wage': 'Avg. Weekly Wages', 'qtrly_estabs_count':'# of Establishments/Firms'}
 
@@ -209,16 +209,8 @@ class Vector(object):
         plt.tight_layout()
         plt.show()
         return fig
-
-        #plot pre-peak, nadir, and recovery. Commented out for now
-        ''' 
-        ax.axhline(y = self.nadir, xmin = self.x[0], xmax = quarters_display[self.recovery_qtr], color = 'red', linewidth = .5,  alpha = 0.5, label = 'nadir: ' + str(quarters_display[self.nadir_qtr]))
-        ax.axhline(y = self.pre_peak, xmin = self.x[0], xmax = quarters_display[self.recovery_qtr], color = 'blue', linewidth = .5, alpha = .5, label = 'pre-recession-peak: ' + str(quarters_display[self.pre_peak_qtr]), linestyle = '-')
-        ax.axhline(y = self.post_peak, xmin = self.x[0], xmax = self.x[-1], color = 'blue', linewidth = .5, alpha = .5, label = 'post-recession-peak: ' + str(quarters_display[self.post_peak_qtr]))
-        ax.axvline(x = quarters_display[self.recovery_qtr], color = 'purple', linewidth = 0.5, alpha = 0.5, label = 'recovery: ' + str(quarters_display[self.recovery_qtr]), linestyle =':')
-        '''
         
-    def plot_mulitple(self, keys, title = None):
+    def plot_mulitple(self, keys, title = None, legend_outside = False):
         """
         Plots a series of lines.
 
@@ -248,7 +240,10 @@ class Vector(object):
         ax.legend(fancybox = True, borderaxespad=0)
         ax.set_ylabel(var_display[self.variable])
         plt.xticks(rotation=45)
-        plt.tight_layout()
+        if legend_outside:
+            plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        else:
+            plt.tight_layout()
         plt.show()
     
     def plot_children(self):
@@ -288,7 +283,7 @@ class Vector(object):
         title = 'Parent industry of: ' + self.row.title + " (" + str(self.key) + ")" 
         return self.plot_mulitple(keys = keys, title = title)
 
-    def plot_siblings(self):
+    def plot_siblings(self, legend_outside=False):
         """
         Plots all sibling industries of the vector, including the vector itself.
 
@@ -304,7 +299,7 @@ class Vector(object):
             pass
         title = 'Sibling industries of: ' + self.row.title + " (" + str(self.key) + ")"
         keys = self.row.siblings
-        return self.plot_mulitple(keys = keys, title = title)
+        return self.plot_mulitple(keys = keys, title = title, legend_outside = legend_outside)
 
 def recession_comparison(key, variable, dimension):
     '''
