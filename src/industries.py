@@ -161,5 +161,3 @@ class Industry(object):
             return 6
         elif code <= 999999:
             return 7 
-
-
