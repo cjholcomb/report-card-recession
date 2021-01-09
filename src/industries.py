@@ -1,3 +1,5 @@
+from charting import Vector, variable_comparison, recession_comparison
+
 #splits industry designations into "generations", dividing them by their layers. 
 industry_generations = {0: [10], 
     1: [101, 102], 
@@ -96,7 +98,7 @@ class Industry(object):
     siblings : list
         codes of industries that share a parent industry
     orphan : bool
-        inidcates if industry is idnentical to parent (no siblings)
+        indicates if industry is idnentical to parent (no siblings)
 
     Methods
     -------
@@ -161,3 +163,28 @@ class Industry(object):
             return 6
         elif code <= 999999:
             return 7 
+
+    def chart_profile(self, dimension = 'industry', compvar = False, comprec = True, single = False):
+        
+        if compvar:
+            self.compvar_2001 = variable_comparison(key = self.index, recession= 2001, dimension= 'industry', show = False, savepath = None)
+            self.compvar_2008 = variable_comparison(key = self.index, recession= 2008, dimension= 'industry', show = False, savepath = None)
+        
+        if comprec:
+            self.comprec_empl = recession_comparison(key = self.index, variable = 'month3_emplvl', dimension= 'industry', show = False, savepath = None)
+            self.comprec_wage = recession_comparison(key = self.index, variable = 'avg_wkly_wage', dimension= 'industry', show = False, savepath = None)
+            self.comprec_wage = recession_comparison(key = self.index, variable = 'qtrly_estabs_count', dimension= 'industry', show = False, savepath = None)
+
+        if single:
+            vector = Vector(key = self.index, recession = 2001, dimension= dimension, variable = 'month3_emplvl', show = False)
+            self.empl_2001 = vector.plot_single(colorcode = True, check = False)
+            vector = Vector(key = self.index, recession = 2008, dimension= dimension, variable = 'month3_emplvl', show = False)
+            self.empl_2008 = vector.plot_single(colorcode = True, check = False)
+            vector = Vector(key = self.index, recession = 2001, dimension= dimension, variable = 'avg_wkly_wage', show = False)
+            self.wage_2001 = vector.plot_single(colorcode = True, check = False)
+            vector = Vector(key = self.index, recession = 2008, dimension= dimension, variable = 'avg_wkly_wage', show = False)
+            self.wage_2008 = vector.plot_single(colorcode = True, check = False)
+            vector = Vector(key = self.index, recession = 2001, dimension= dimension, variable = 'qtrly_estabs_count', show = False)
+            self.firm_2001 = vector.plot_single(colorcode = True, check = False)
+            vector = Vector(key = self.index, recession = 2008, dimension= dimension, variable = 'qtrly_estabs_count', show = False)
+            self.firm_2008 = vector.plot_single(colorcode = True, check = False)

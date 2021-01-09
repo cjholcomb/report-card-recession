@@ -144,7 +144,7 @@ class Vector(object):
         self.pre_peak_qtr = quarters_display[df['pre_peak_qtr'].loc[key]]
         self.post_peak_qtr = quarters_display[df['post_peak_qtr'].loc[key]]
 
-    def plot_single(self, colorcode = True, check = False):
+    def plot_single(self, colorcode = True, check = False, show = True):
         """
         Plots the vector by itself.
 
@@ -154,7 +154,8 @@ class Vector(object):
                 Determines if decline, recovery, and growth sections will be highlighted on the graph
             check : bool (default False)
                 Determines if all important points will be charted. Used for troubleshooting.
-
+            show : bool (default True)
+                Determines if the chart will be shown.
         Returns
         -------
             fig : matplotlib plot
@@ -207,7 +208,8 @@ class Vector(object):
         plt.xticks(rotation=45)
         ax.set_ylabel(var_display[self.variable])
         plt.tight_layout()
-        plt.show()
+        if show:
+            plt.show()
         return fig
         
     def plot_mulitple(self, keys, title = None, legend_outside = False):
@@ -301,7 +303,7 @@ class Vector(object):
         keys = self.row.siblings
         return self.plot_mulitple(keys = keys, title = title, legend_outside = legend_outside)
 
-def recession_comparison(key, variable, dimension):
+def recession_comparison(key, variable, dimension, show = True):
     '''
     Creates the "scary chart"- proportional growth for a single area/industry. All recessions included in chart.
 
@@ -313,7 +315,7 @@ def recession_comparison(key, variable, dimension):
         Returns: 
             fig (matplotlib plot)
     '''
-    fig, ax = plt.subplots(figsize =(15, 10))
+    fig, ax = plt.subplots(figsize =(10, 4))
     if dimension == 'area':
         index = 'area_fips'
         title = 'Recession Comparison, ' + area_titles[key] + " (" + str(key) + ")" 
@@ -336,10 +338,11 @@ def recession_comparison(key, variable, dimension):
     ax.set_title(title)
     ax.yaxis.set_major_formatter(mtick.PercentFormatter())
     plt.legend()
-    plt.show()
+    if show:
+        plt.show()
     return fig
 
-def variable_comparison(key, recession, dimension):
+def variable_comparison(key, recession, dimension, show = True, savepath = None):
     '''
     Creates the "scary chart"- proportional growth for a single area/industry. All recessions included in chart.
 
@@ -353,7 +356,7 @@ def variable_comparison(key, recession, dimension):
     '''
     if recession == 'full':
         pass
-    fig, ax = plt.subplots(figsize =(15, 10))
+    fig, ax = plt.subplots(figsize =(10, 4))
     if dimension == 'area':
         index = 'area_fips'
         title = area_titles[key] + ' (' + str(key) + ') ' + 'performance: ' + str(recession) + ' recession'
@@ -376,5 +379,8 @@ def variable_comparison(key, recession, dimension):
     ax.yaxis.set_major_formatter(mtick.PercentFormatter())
     ax.set_title(title)
     plt.legend()
-    plt.show()
+    if savepath:
+        plt.savefig(savepath)
+    if show:
+        plt.show()
     return fig

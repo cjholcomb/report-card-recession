@@ -17,63 +17,44 @@ import pandas as pd
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'any secret string'
 
-test = [
-    {'area_fips': '00001',
-    'area_name': 'Macon, Georgia',
-    'forecast': False
-    },
-
-     {'area_fips': '00002',
-    'area_name': 'Willimantic, Connecticut',
-    'forecast': True
-    }
-]
-
-@app.route('/', methods = ['GET', 'POST'])
-# @app.route('/index')
-# @app.route('/home')
-# @app.route('/table-of-contents')
-# @app.route('/contents')
-# def contents():
-#     return render_template('index.html', areas = test)
-
-# @app.route('/overview')
-# def overview():
-#     return render_template('overview.html')
-
-# @app.route('/dataset')
-# @app.route('/data')
-# def data():
-#     return render_template('data.html')
-
-# @app.route('/exploratory-data-analysis')
-# @app.route('/EDA')
-# def eda():
-#     return render_template('EDA.html')
-
-
-# @app.route('/models')
-# def models():
-#     return render_template('models.html')
-
-# @app.route('/lookup_area', methods = ['GET'])
-# def fips_search():
-#     return render_template('lookup_area.html')
-
 @app.route('/lookup_indus', methods = ['GET'])
 def industry_search():
-    return render_template('lookup_area.html')
+    return render_template('lookup_indus.html')
 
 @app.route('/results', methods = ['GET','POST'])
 def results():
-    code = int(request.form(industry_code))
+    code = int(request.form['industry_code'])
     industry = Industry(code)
+    title = industry.title
+    varcomp_2001 = variable_comparison(key = code, recession= 2001, dimension= 'industry', show = False, savepath = None)
+    plt.savefig('src/static/images/compvar_2001.png')
+    varcomp_2008 = variable_comparison(key = code, recession= 2008, dimension= 'industry', show = False, savepath = None)
+    plt.savefig('src/static/images/compvar_2008.png')
+    return render_template('results.html', code = code, title = title)
 
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r
 
+# @app.route('/static/images/varcomp_2001.png')
+# def varcomp_2001():
+#     fig = variable_comparison(key = code, recession= 2001, dimension= 'industry')
+#     plt.savefig('/static/images/varcomp_2001.png')
+#     return fig
 
-
-
-
+# @app.route('/results', methods = ['GET','POST'])
+# def results():
+#     code = request.form['industry_code']
+#     # industry = Industry(code)
+#     return render_template('results.html', code = code)
 
     # fips = str(request.form['fips'])
     # area = Area(fips, df_2001, df_2008, df_2020)
@@ -107,28 +88,10 @@ def results():
     #  jobs = area.jobs_2020,
 
 
-     
 
-# @app.route('/2001')
-# def map_2001:
+if __name__ == '__main__':
+    app.run(host = '0.0.0.0', debug = True)
 
-@app.after_request
-def add_header(r):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also to cache the rendered page for 10 minutes.
-    """
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
-    r.headers['Cache-Control'] = 'public, max-age=0'
-    return r
-
-@app.route('/static/images/varcomp_2001.png')
-def varcomp_2001():
-    fig = variable_comparison(key = code, recession= 2001, dimension= 'industry')
-    plt.savefig('/static/images/varcomp_2001.png')
-    return fig
 # @app.route('/static/images/plot_2001.png')
 # def plot_2001():
 #     fig, ax = plt.subplots(figsize = (12,4))
@@ -156,7 +119,7 @@ def varcomp_2001():
 
 # @app.route('/industry-lookup')
 
-# if __name__ == '__main__':
+
     
 #     quarters_2001 = {'2000.25': 'Q1 2000', '2000.5': 'Q2 2000', '2000.75': 'Q3 2000', '2001.0': 'Q4 2000', 
 #                 '2001.25': 'Q1 2001', '2001.5': 'Q2 2001', '2001.75': 'Q3 2001', '2002.0': 'Q4 2001', 
@@ -189,7 +152,44 @@ def varcomp_2001():
 #     df_2008 = df_2008.set_index('area_fips')
 #     df_2008 = df_2008.rename(columns = quarters_2008)
 #     df_2020 = pd.read_json('data/prediction_2020.json')
-#     app.run(host = '0.0.0.0', debug = True)
+
+# @app.route('/', methods = ['GET', 'POST'])
+# @app.route('/index')
+# @app.route('/home')
+# @app.route('/table-of-contents')
+# @app.route('/contents')
+# def contents():
+#     return render_template('index.html', areas = test)
+
+# @app.route('/overview')
+# def overview():
+#     return render_template('overview.html')
+
+# @app.route('/dataset')
+# @app.route('/data')
+# def data():
+#     return render_template('data.html')
+
+# @app.route('/exploratory-data-analysis')
+# @app.route('/EDA')
+# def eda():
+#     return render_template('EDA.html')
+
+
+# @app.route('/models')
+# def models():
+#     return render_template('models.html')
+
+# @app.route('/lookup_area', methods = ['GET'])
+# def fips_search():
+#     return render_template('lookup_area.html')
 
 
 
+
+
+
+     
+
+# @app.route('/2001')
+# def map_2001:
