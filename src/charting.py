@@ -4,11 +4,11 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-from src.produce_datasets import filepath
+from produce_datasets import filepath
 
-from src.recessions import *
-from src.areas import *
-from src.industries import *
+from recessions import *
+from areas import *
+from industries import *
 
 var_display ={'month3_emplvl': 'Total Employment', 'avg_wkly_wage': 'Avg. Weekly Wages', 'qtrly_estabs_count':'# of Establishments/Firms'}
 
