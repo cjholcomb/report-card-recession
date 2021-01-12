@@ -1,9 +1,6 @@
 
 from flask import Flask, render_template, url_for, flash, redirect, request, session, make_response
-from areas import Area
-from industries import Industry
-from recessions import Recession
-from charting import Vector, variable_comparison, recession_comparison
+from charting import *
 
 import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -11,11 +8,12 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
-
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'any secret string'
+
+@app.route('/')
+def landing():
+    return render_template('lookup_indus.html')
 
 @app.route('/lookup_indus', methods = ['GET'])
 def industry_search():
@@ -24,13 +22,21 @@ def industry_search():
 @app.route('/results', methods = ['GET','POST'])
 def results():
     code = int(request.form['industry_code'])
+    
+    #compute key metrics
     industry = Industry(code)
     title = industry.title
-    varcomp_2001 = variable_comparison(key = code, recession= 2001, dimension= 'industry', show = False, savepath = None)
-    plt.savefig('src/static/images/compvar_2001.png')
-    varcomp_2008 = variable_comparison(key = code, recession= 2008, dimension= 'industry', show = False, savepath = None)
-    plt.savefig('src/static/images/compvar_2008.png')
-    return render_template('results.html', code = code, title = title)
+    stats = produce_stats(code)
+
+    #produce charts
+    objective_charts(code)
+    subjective_charts(code)
+
+    ##comparison charts
+  
+    return render_template('results.html', code = code, title = title, stats = stats)
+
+    ##Objective charts
 
 @app.after_request
 def add_header(r):
@@ -43,6 +49,10 @@ def add_header(r):
     r.headers["Expires"] = "0"
     r.headers['Cache-Control'] = 'public, max-age=0'
     return r
+
+if __name__ == '__main__':
+    app.run(host = '0.0.0.0', debug = True)
+
 
 # @app.route('/static/images/varcomp_2001.png')
 # def varcomp_2001():
@@ -89,8 +99,6 @@ def add_header(r):
 
 
 
-if __name__ == '__main__':
-    app.run(host = '0.0.0.0', debug = True)
 
 # @app.route('/static/images/plot_2001.png')
 # def plot_2001():
