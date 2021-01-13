@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content %}
+<div class="content-section">
+    <fieldset class="form-group"></fieldset>
+        <legend class="border-bottom mb-4">Enter an industry code:</a>
+            <div class="form-group">
+            <form action="/results" method="POST">
+                <input type="text" id="industry_code" name="industry_code">
+                <input type="submit" value="Submit">
+            </form>
+            </div>
+        </legend>
+    </fieldset>
+</div>
+{% endblock %}

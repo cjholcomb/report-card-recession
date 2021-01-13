@@ -1,0 +1,226 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+
+{% endblock title %}
+
+{% block content %}
+<style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;table-layout:fixed;width: auto}
+    .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+      overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+      font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg .tg-mk27{background-color:#ece8d9;border-color:#333333;text-align:left;vertical-align:top}
+    .tg .tg-r6y2{background-color:#ecd2d9;border-color:#333333;text-align:left;vertical-align:top}
+    .tg .tg-5orx{background-color:#eaeaf2;border-color:#333333;text-align:left;vertical-align:top}
+    .tg .tg-sn4r{border-color:#333333;font-weight:bold;text-align:left;vertical-align:top}
+    .tg .tg-9ir6{background-color:#d2dfd9;border-color:#333333;text-align:left;vertical-align:top}
+    </style>
+<small>Industry Code: {{ code }}</small>
+<h2>{{ title }}</h2>
+<br>
+<h3>Employment:</h3>
+<img src="static/images/comprec_empl.png" alt="comprec_empl">
+<br>
+<br>
+<h4>2008 Recession:</h4>
+<img src="static/images/empl_2008.png" alt="empl_2008.png">
+    <table class="tg">
+    <thead>
+      <tr>
+        <th class="tg-sn4r">Pre-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Decline:</th>
+        <th class="tg-sn4r">Recession <br>Low:</th>
+        <th class="tg-sn4r">Recovery:</th>
+        <th class="tg-sn4r">Post-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Net Growth:</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="tg-5orx">{{ stats[2008]['empl']['pre_peak'] }}<br>({{ stats[2008]['empl']['pre_peak_qtr'] }})<br></td>
+        <td class="tg-r6y2">{{ stats[2008]['empl']['decline_time'] }}<br>({{ stats[2008]['empl']['decline_pcg'] }})<br></td>
+        <td class="tg-5orx">{{ stats[2008]['empl']['nadir'] }}<br>({{ stats[2008]['empl']['nadir_qtr'] }})<br></td>
+        {% if stats[2008]['empl']['recovery'] %}
+            <td class="tg-mk27">{{ stats[2008]['empl']['recovery_time'] }}<br>({{ stats[2008]['empl']['recovery_qtr'] }})</td>
+        {% else %}
+            <td class="tg-mk27">N/A</td>
+        {% endif %}
+        <td class="tg-5orx">{{ stats[2008]['empl']['post_peak'] }}<br>({{ stats[2008]['empl']['post_peak_qtr'] }})<br></td>
+        <td class="tg-9ir6">{{ stats[2008]['empl']['delta'] }}<br>({{ stats[2008]['empl']['growth_pcg'] }},<br>{{ stats[2008]['empl']['growth_time'] }})</td>
+      </tr>
+    </tbody>
+    </table>
+<br>
+<h4>2001 Recession:</h4>
+<img src="static/images/empl_2001.png" alt="empl_2001.png">
+<style type="text/css">
+    </style>
+    <table class="tg">
+    <thead>
+      <tr>
+        <th class="tg-sn4r">Pre-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Decline:</th>
+        <th class="tg-sn4r">Recession <br>Low:</th>
+        <th class="tg-sn4r">Recovery:</th>
+        <th class="tg-sn4r">Post-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Net Growth:</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="tg-5orx">{{ stats[2001]['empl']['pre_peak'] }}<br>({{ stats[2001]['empl']['pre_peak_qtr'] }})<br></td>
+        <td class="tg-r6y2">{{ stats[2001]['empl']['decline_time'] }}<br>({{ stats[2001]['empl']['decline_pcg'] }})<br></td>
+        <td class="tg-5orx">{{ stats[2001]['empl']['nadir'] }}<br>({{ stats[2001]['empl']['nadir_qtr'] }})<br></td>
+        {% if stats[2001]['empl']['recovery'] %}
+            <td class="tg-mk27">{{ stats[2001]['empl']['recovery_time'] }}<br>({{ stats[2001]['empl']['recovery_qtr'] }})</td>
+        {% else %}
+            <td class="tg-mk27">N/A</td>
+        {% endif %}
+        <td class="tg-5orx">{{ stats[2001]['empl']['post_peak'] }}<br>({{ stats[2001]['empl']['post_peak_qtr'] }})<br></td>
+        <td class="tg-9ir6">{{ stats[2001]['empl']['delta'] }}<br>({{ stats[2001]['empl']['growth_pcg'] }},<br>{{ stats[2001]['empl']['growth_time'] }})</td>
+      </tr>
+    </tbody>
+    </table>
+<br>
+<h3>Wages:</h3>
+<img src="static/images/comprec_wage.png" alt="comprec_wage">
+<br>
+<br>
+<h4>2008 Recession:</h4>
+<img src="static/images/wage_2008.png" alt="wage_2008.png">
+    <table class="tg">
+    <thead>
+      <tr>
+        <th class="tg-sn4r">Pre-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Decline:</th>
+        <th class="tg-sn4r">Recession <br>Low:</th>
+        <th class="tg-sn4r">Recovery:</th>
+        <th class="tg-sn4r">Post-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Net Growth:</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="tg-5orx">{{ stats[2008]['wage']['pre_peak'] }}<br>({{ stats[2008]['wage']['pre_peak_qtr'] }})<br></td>
+        <td class="tg-r6y2">{{ stats[2008]['wage']['decline_time'] }}<br>({{ stats[2008]['wage']['decline_pcg'] }})<br></td>
+        <td class="tg-5orx">{{ stats[2008]['wage']['nadir'] }}<br>({{ stats[2008]['wage']['nadir_qtr'] }})<br></td>
+        {% if stats[2008]['wage']['recovery'] %}
+            <td class="tg-mk27">{{ stats[2008]['wage']['recovery_time'] }}<br>({{ stats[2008]['wage']['recovery_qtr'] }})</td>
+        {% else %}
+            <td class="tg-mk27">N/A</td>
+        {% endif %}
+        <td class="tg-5orx">{{ stats[2008]['wage']['post_peak'] }}<br>({{ stats[2008]['wage']['post_peak_qtr'] }})<br></td>
+        <td class="tg-9ir6">{{ stats[2008]['wage']['delta'] }}<br>({{ stats[2008]['wage']['growth_pcg'] }},<br>{{ stats[2008]['wage']['growth_time'] }})</td>
+      </tr>
+    </tbody>
+    </table>
+<br>
+<h4>2001 Recession:</h4>
+<img src="static/images/wage_2001.png" alt="wage_2001.png">
+<style type="text/css">
+    </style>
+    <table class="tg">
+    <thead>
+      <tr>
+        <th class="tg-sn4r">Pre-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Decline:</th>
+        <th class="tg-sn4r">Recession <br>Low:</th>
+        <th class="tg-sn4r">Recovery:</th>
+        <th class="tg-sn4r">Post-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Net Growth:</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="tg-5orx">{{ stats[2001]['wage']['pre_peak'] }}<br>({{ stats[2001]['wage']['pre_peak_qtr'] }})<br></td>
+        <td class="tg-r6y2">{{ stats[2001]['wage']['decline_time'] }}<br>({{ stats[2001]['wage']['decline_pcg'] }})<br></td>
+        <td class="tg-5orx">{{ stats[2001]['wage']['nadir'] }}<br>({{ stats[2001]['wage']['nadir_qtr'] }})<br></td>
+        {% if stats[2001]['wage']['recovery'] %}
+            <td class="tg-mk27">{{ stats[2001]['wage']['recovery_time'] }}<br>({{ stats[2001]['wage']['recovery_qtr'] }})</td>
+        {% else %}
+            <td class="tg-mk27">N/A</td>
+        {% endif %}
+        <td class="tg-5orx">{{ stats[2001]['wage']['post_peak'] }}<br>({{ stats[2001]['wage']['post_peak_qtr'] }})<br></td>
+        <td class="tg-9ir6">{{ stats[2001]['wage']['delta'] }}<br>({{ stats[2001]['wage']['growth_pcg'] }},<br>{{ stats[2001]['wage']['growth_time'] }})</td>
+      </tr>
+    </tbody>
+    </table>
+<br>
+<h3>Establishments:</h3>
+<img src="static/images/comprec_firm.png" alt="comprec_firm">
+<br>
+<br>
+<h4>2008 Recession:</h4>
+<img src="static/images/firm_2008.png" alt="firm_2008.png">
+    <table class="tg">
+    <thead>
+      <tr>
+        <th class="tg-sn4r">Pre-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Decline:</th>
+        <th class="tg-sn4r">Recession <br>Low:</th>
+        <th class="tg-sn4r">Recovery:</th>
+        <th class="tg-sn4r">Post-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Net Growth:</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="tg-5orx">{{ stats[2008]['firm']['pre_peak'] }}<br>({{ stats[2008]['firm']['pre_peak_qtr'] }})<br></td>
+        <td class="tg-r6y2">{{ stats[2008]['firm']['decline_time'] }}<br>({{ stats[2008]['firm']['decline_pcg'] }})<br></td>
+        <td class="tg-5orx">{{ stats[2008]['firm']['nadir'] }}<br>({{ stats[2008]['firm']['nadir_qtr'] }})<br></td>
+        {% if stats[2008]['firm']['recovery'] %}
+            <td class="tg-mk27">{{ stats[2008]['firm']['recovery_time'] }}<br>({{ stats[2008]['firm']['recovery_qtr'] }})</td>
+        {% else %}
+            <td class="tg-mk27">N/A</td>
+        {% endif %}
+        <td class="tg-5orx">{{ stats[2008]['firm']['post_peak'] }}<br>({{ stats[2008]['firm']['post_peak_qtr'] }})<br></td>
+        <td class="tg-9ir6">{{ stats[2008]['firm']['delta'] }}<br>({{ stats[2008]['firm']['growth_pcg'] }},<br>{{ stats[2008]['firm']['growth_time'] }})</td>
+      </tr>
+    </tbody>
+    </table>
+<br>
+<h4>2001 Recession:</h4>
+<img src="static/images/firm_2001.png" alt="firm_2001.png">
+<style type="text/css">
+    </style>
+    <table class="tg">
+    <thead>
+      <tr>
+        <th class="tg-sn4r">Pre-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Decline:</th>
+        <th class="tg-sn4r">Recession <br>Low:</th>
+        <th class="tg-sn4r">Recovery:</th>
+        <th class="tg-sn4r">Post-Recession <br>Peak:</th>
+        <th class="tg-sn4r">Net Growth:</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="tg-5orx">{{ stats[2001]['firm']['pre_peak'] }}<br>({{ stats[2001]['firm']['pre_peak_qtr'] }})<br></td>
+        <td class="tg-r6y2">{{ stats[2001]['firm']['decline_time'] }}<br>({{ stats[2001]['firm']['decline_pcg'] }})<br></td>
+        <td class="tg-5orx">{{ stats[2001]['firm']['nadir'] }}<br>({{ stats[2001]['firm']['nadir_qtr'] }})<br></td>
+        {% if stats[2001]['firm']['recovery'] %}
+            <td class="tg-mk27">{{ stats[2001]['firm']['recovery_time'] }}<br>({{ stats[2001]['firm']['recovery_qtr'] }})</td>
+        {% else %}
+            <td class="tg-mk27">N/A</td>
+        {% endif %}
+        <td class="tg-5orx">{{ stats[2001]['firm']['post_peak'] }}<br>({{ stats[2001]['firm']['post_peak_qtr'] }})<br></td>
+        <td class="tg-9ir6">{{ stats[2001]['firm']['delta'] }}<br>({{ stats[2001]['firm']['growth_pcg'] }},<br>{{ stats[2001]['firm']['growth_time'] }})</td>
+      </tr>
+    </tbody>
+    </table>
+<br>
+<br>
+
+
+<h3>Economic Indicator Comparisons:</h3>
+
+<h4>2008 Recession:</h4>
+<img src="static/images/compvar_2008.png" alt="compvar_2008"> 
+
+<h4>2001 Recession:</h4>
+<img src="static/images/compvar_2001.png" alt="compvar_2001">
+
+{% endblock content %}

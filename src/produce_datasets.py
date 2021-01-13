@@ -1,33 +1,15 @@
 import pandas as pd
 import numpy as np
 
-from src.recessions import *
-from src.industries import industry_titles
+from classes import *
+# from recessions import Recession
+# from industries import industry_titles
 
 #schema for importing dataframe
 schema_dict = { 'area_fips':str,  'own_code':str,  'industry_code':str,  'agglvl_code':str,  'size_code':str,  'year':int,  'qtr':int,  'disclosure_code':str, 'area_title':str,  'own_title':str,  'industry_title':str,  'agglvl_title':str,  'size_title':str,  'qtrly_estabs':int,  'month1_emplvl':int,  'month2_emplvl':int,  'month3_emplvl':int,  'total_qtrly_wages':int,  'taxable_qtrly_wages':int,  'qtrly_contributions':int,  'avg_wkly_wage':int,  'lq_disclosure_code':str,  'lq_qtrly_estabs':float,  'lq_month1_emplvl':float,  'lq_month1_emplv2':float,  'lq_month1_emplv3':float,  'lq_total_qtrly_wages':float,  'lq_taxable_qtrly_wages':float,  'lq_qrtly_contributions':float,  'oty_disclosure_code':str,  'oty_qtrly_estabs':int,  'oty_qtrly_estabs_pct_chg':float,  'oty_month1_emplvl_chg':int,  'oty_month1_emplvl_pct_chg':float,  'oty_month2_emplv_chg':int,  'oty_month2_emplvl_pct_chg':float,  'oty_month3_emplvl_chg':int,  'oty_month3_emplvl_pct_chg':float,  'oty_total_qtrly_wages_chg':int,  'oty_total_qtrly_wages_pct_chg':float,  'oty_taxable_qtrly_wages_chg':int,  'oty_taxable_qtrly_wages_pct_chg':float,  'oty_qrtly_contributions_chg':int,  'oty_qrtly_contributions_pct_chg':float,  'oty_avg_wkly_wage_chg':int,  'oty_avg_wkly_wage_pct_chg':float} 
 
 #unused columns from QCEW
 import_drop = ['own_code',  'size_code',  'disclosure_code',  'own_title',  'size_title',  'lq_disclosure_code', 'oty_disclosure_code',  'oty_month1_emplvl_chg',  'oty_month2_emplvl_chg',  'oty_month3_emplvl_chg',  'oty_total_qtrly_wages_chg',  'oty_taxable_qtrly_wages_chg',  'oty_qtrly_contributions_chg',  'oty_avg_wkly_wage_chg',  'lq_qtrly_estabs_count',  'lq_month1_emplvl',  'lq_month2_emplvl',  'lq_month3_emplvl',  'lq_total_qtrly_wages',  'lq_taxable_qtrly_wages',  'lq_qtrly_contributions',  'oty_qtrly_estabs_count_chg',  'oty_qtrly_estabs_count_pct_chg',  'oty_month1_emplvl_pct',  'oty_month2_emplvl_pct',  'oty_month3_emplvl_pct',  'oty_total_qtrly_wages_pct',  'oty_taxable_qtrly_wages_chg',  'oty_qtrly_contributions_pct',  'oty_avg_wkly_wage_pct',  'oty_taxable_qtrly_wages_chg.1',  'lq_avg_wkly_wage',  'taxable_qtrly_wages',  'qtrly_contributions']
-
-def filepath(variable = 'month3_emplvl', dimension = 'area', charttype = 'basic', recession = 2001, filetype = 'json'):
-    '''
-    creates the filepath to load/save dataframes
-
-        Parameters: 
-            variable (str): indicates if the loaded/saved file will contain employment, wage, or firm data. Must be one of ['month3_emplvl' (default), 'avg_wkly_wage', 'qtrly_estabs_count']. 
-            dimension (str): indicates if the loaded/saved file will construct area or industry timelines. Must be one of ['area', 'timeline'].
-            charttype (str): indicates what type of timeline will be loaded/saved. Differentiation required for differing chart types in charting.py. Must be one of ['basic', 'target', 'proprtional'].
-            recession (str): indicates the timeframe in question. Must be one of [2001, 2008, 'full']. 
-            filetype (str): determines what type of file will be saved/loaded. Must be one of ['json', 'csv']. Use 'csv' for loading raw QCEW files.
-
-        Returns:
-            filepath (str): path to load appropriate file
-    '''
-    filename = dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + "." + filetype 
-    filepath = "data/timelines/" + charttype + "/" + dimension + "/" + var_abbr[variable] + '/' +  filename 
-    # print(filepath)
-    return filepath
 
 def add_qtrid(df):
     '''
@@ -94,7 +76,7 @@ def import_all(years, dimension = 'area'):
     df = add_qtrid(df)
     return df
 
-def basic_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 2001, save = False):
+def basic_timeline(variable = 'empl', dimension = 'area', recession = 2001, save = False):
     '''
     Produces a dataframe of the indicated recession timeline.
 
@@ -109,7 +91,7 @@ def basic_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 2
             exported json file
     '''
     #creates dataframe of all years in recession
-    df = import_all(recessions_int[recession], dimension)
+    df = import_all(RECESSION_YEARS[recession], dimension)
 
     #set indicies, drop unhelpful rows
     if dimension == 'area':
@@ -118,11 +100,11 @@ def basic_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 2
     elif dimension == 'industry':
         index = ['industry_code', 'industry_title']
         #correct for changes in NAICS classification
-        df['industry_title'] = df['industry_code'].apply(lambda x: industry_titles[x])
+        df['industry_title'] = df['industry_code'].apply(lambda x: TITLE[x])
     
     
     #pivots the table to arrange quarters in columns, drops extraneous variables.
-    df = df.pivot_table(columns = 'qtrid', values = variable, index = index, aggfunc = np.sum)
+    df = df.pivot_table(columns = 'qtrid', values = VARNAME_LONG[variable], index = index, aggfunc = np.sum)
     df = df.reset_index()
     
         #fill nans
@@ -136,7 +118,7 @@ def basic_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 2
         df.to_json(savepath)
     return df
 
-def target_timeline(variable = 'month3_emplvl', dimension = 'area', recession = 2001, save = False, loadjson = False):
+def target_timeline(variable = 'empl', dimension = 'area', recession = 2001, save = False, loadjson = False):
     '''
     Produces a dataframe of the indicated recession timeline with derived target variables.
     WARNING: Long processing time required.
@@ -311,16 +293,19 @@ def export_all(basic = False, target = False, proportion = False):
     '''
     if basic:
         for dimension in ['area', 'industry']: 
-            for variable in ['month3_emplvl', 'avg_wkly_wage', 'qtrly_estabs_count']: 
-                for recession in [2001, 2008, 'full']: 
+            for variable in VARNAME_LONG.keys(): 
+                for recession in VALID_RECESSIONS: 
                     basic_timeline(variable = variable, dimension = dimension, recession = recession, save = True)
+                basic_timeline(variable = variable, dimension = dimension, recession = 'full', save = True)
+
     if target:
         for dimension in ['area', 'industry']: 
-            for variable in ['month3_emplvl', 'avg_wkly_wage', 'qtrly_estabs_count']: 
-                for recession in [2001, 2008]: 
-                    target_timeline(variable = variable, dimension = dimension, recession = recession, save = True, loadjson= basic )
+            for variable in VARNAME_LONG.keys(): 
+                for recession in VALID_RECESSIONS:
+                    target_timeline(variable = variable, dimension = dimension, recession = recession, save = True, loadjson= not basic)
+
     if proportion:
-        for dimension in ['area', 'industry']: 
-            for variable in ['month3_emplvl', 'avg_wkly_wage', 'qtrly_estabs_count']: 
-                for recession in [2001, 2008]: 
+        for dimension in ['area', 'industry']:
+            for variable in VARNAME_LONG.keys(): 
+                for recession in VALID_RECESSIONS:
                     proportional_timeline(variable = variable, dimension = dimension, recession = recession, save = True)                                                                                                                  
