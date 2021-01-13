@@ -207,11 +207,13 @@ class Vector(object):
         
         if self.recovery:
             self.recovery_qtr = QUARTERS[df['recovery_qtr'].loc[key]]
+        else:
+            self.recovery_qtr = None
         self.nadir_qtr = QUARTERS[df['nadir_qtr'].loc[key]] 
         self.pre_peak_qtr = QUARTERS[df['pre_peak_qtr'].loc[key]]
         self.post_peak_qtr = QUARTERS[df['post_peak_qtr'].loc[key]]
 
-        pcg = '{:%}'
+        pcg = '{:.2%}'
         self.decline_pcg = pcg.format((self.pre_peak - self.nadir) / self.pre_peak) 
         self.growth_pcg = pcg.format(self.delta / self.pre_peak)
 
@@ -512,26 +514,35 @@ def full_comparison(key, show = True, savepath = None):
     return fig
 
 def produce_stats(key):
+    commas = "{:,}"
+    pcg = '{:.2%}'
+    dollars = "${:,.2f}"
     stats ={}
     for recession in VALID_RECESSIONS:
         stats[recession] = {}
         for variable in VARNAME_LONG.keys():
             stats[recession][variable] ={}
             
-            vector = Vector(key, 2001, 'empl')
+            vector = Vector(key, recession, variable)
             stats[recession][variable]['recovery'] = vector.recovery
 
             #Numeric Stats
-            stats[recession][variable]['pre_peak'] = vector.pre_peak
-            stats[recession][variable]['nadir'] = vector.nadir
-            stats[recession][variable]['post_peak'] = vector.post_peak
-            stats[recession][variable]['delta'] = vector.delta
+            if variable == 'wage':
+                stats[recession][variable]['pre_peak'] = dollars.format(int(vector.pre_peak))
+                stats[recession][variable]['nadir'] = dollars.format(int(vector.nadir))
+                stats[recession][variable]['post_peak'] = dollars.format(int(vector.post_peak))
+                stats[recession][variable]['delta'] = dollars.format(int(vector.delta))
+            else:
+                stats[recession][variable]['pre_peak'] = commas.format(int(vector.pre_peak))
+                stats[recession][variable]['nadir'] = commas.format(int(vector.nadir))
+                stats[recession][variable]['post_peak'] = commas.format(int(vector.post_peak))
+                stats[recession][variable]['delta'] = commas.format(int(vector.delta))
 
             #Time Stats
-            stats[recession][variable]['decline_time'] = vector.decline_time / 4
+            stats[recession][variable]['decline_time'] = str(vector.decline_time / 4) + ' years'
             if vector.recovery:
-                stats[recession][variable]['recovery_time'] = vector.recovery_time / 4
-                stats[recession][variable]['growth_time'] = vector.growth_time / 4
+                stats[recession][variable]['recovery_time'] = str((vector.recovery_time + vector.decline_time)/ 4) + ' years'
+                stats[recession][variable]['growth_time'] = str(vector.growth_time / 4) + ' years'
             else:
                 stats[recession][variable]['recovery_time'] = None
                 stats[recession][variable]['growth_time'] = None
@@ -539,6 +550,7 @@ def produce_stats(key):
             #Quarter Markers Stats
             stats[recession][variable]['pre_peak_qtr'] = vector.pre_peak_qtr
             stats[recession][variable]['nadir_qtr'] = vector.nadir_qtr
+            stats[recession][variable]['recovery_qtr'] = vector.recovery_qtr
             stats[recession][variable]['post_peak_qtr'] = vector.post_peak_qtr
 
             #Percentage Stats
@@ -563,24 +575,3 @@ def objective_charts(key):
             vector = Vector(key, recession, variable)
             savepath = 'src/static/images/' + variable + '_' + str(recession) + '.png'
             vector.plot_self(colorcode = True, check = False, show = False, savepath = savepath)
-    
-
-
-
-# def plot_single(vector, colorcode = True, check = False, show = True, savepath = None):
-#     """
-#     Plots a single vector (one recession, one target/variable, one area/industry)
-    
-#     Parameters: 
-#         vector (Vector class object): uses pre-instantiated vector as chart parameters.
-#         key (str or int): area-fips or industry_code. Default 10. 
-#         recession (int): determines which recession timeline to chart. 'full' will cause function to exit. Ignored if Vector != None.
-#         variable (str): determines what economic indicator will be used in the timeline. Ignored if Vector != None. 
-#         colorcode (bool): Determines if decline, recovery, and growth sections will be highlighted on the graph. Default True.
-#         check (bool): Determines if all important points will be charted. Used for troubleshooting. Default False
-#         show (bool): Determines if the chart will be shown. Default True.    
-#         savepath (str): determines if the chart will be saved locally.
-
-#     Returns: 
-#         matplotlib axis
-#     """

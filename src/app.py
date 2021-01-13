@@ -32,11 +32,7 @@ def results():
     objective_charts(code)
     subjective_charts(code)
 
-    ##comparison charts
-  
     return render_template('results.html', code = code, title = title, stats = stats)
-
-    ##Objective charts
 
 @app.after_request
 def add_header(r):
