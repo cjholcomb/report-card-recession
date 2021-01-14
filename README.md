@@ -23,14 +23,8 @@
                 <p>The dataset is compiled from the  Bureau of Labor Statistics(BLS) Quarterly Census of Employment and Wages (QCEW). The BLS archives contain economic data stretching back decades, across geographic designations and NAICS industry classifications.<p>
                 <p> Data can be downloaded <a href = "https://www.bls.gov/cew/downloadable-data-files.htm">here</a>.</p>
                 <p>While employment numbers are available on a monthly basis, wages and establishments only have quarterly data. Therefore, I will primarily be working with quarterly timelines.
-    <h2>Instructions for downloading data</h2>
-                <p>The code makes several assumptions about the folder structure and file names. Follow these instructions to make sure the data is in a readable state by the code.</p>
-                    <ul>
-                        <li>Create "industry_files" and "area_files" folders in the data/ folder.</li>
-                        <li>Download a file archive from the "CSVs By Area-->Quarterly" or the "CSVs By Industry-->Quarterly". The archive will contain many files, but you only need the total file included in each.</li> 
-                        <li>Save that file in the relevant folder. <b> Note: Files that belong in the Industry folder will be found in the Area column, and vice-versa.</b> This is because the Total file will be the total for across areas/industries, with breakdowns by the other dimension.</li>
-                        <li>Rename the file to only the four-digit year, retaining the .csv extension.</li>
-                    </ul>
+    <h2>Downloading Data</h2>
+                download_files.py contains the functions that download, unpack, and rename the BLS files. Archives are deleted after unpacking, however this still requires many gigs of free disk space. This can take a good deal of time depending on internet connection speeds.
 <h1>Definitions</h1>
                 <p>The below chart is the inspiration for this project, and may help contextualize some of the definitions below.</p>
                     <img src="src/static/images/ScariestJan2017.PNG" alt="Job Losses"></img>
