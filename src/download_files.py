@@ -19,7 +19,10 @@ def download_files(dimensions, years, override = False):
             year = str(year)
             #derive download urls and save paths
             if dimension == 'area':
-                url = 'https://data.bls.gov/cew/data/files/' + str(year) + '/csv/' + str(year) + '_qtrly_by_industry.zip'
+                if int(year) <1990:
+                    url = 'https://data.bls.gov/cew/data/files/' + year +'/csv/' +year + '_qtrly_naics10_totals.zip'
+                else:
+                    url = 'https://data.bls.gov/cew/data/files/' + str(year) + '/csv/' + str(year) + '_qtrly_by_industry.zip'
                 if year == '2020':
                     extractfolder = year + '.q1-q2.by_industry/'
                     extractname = year + '.q1-q2 10 Total, all industries.csv'
