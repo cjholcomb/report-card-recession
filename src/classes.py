@@ -4,7 +4,7 @@ import seaborn as sns
 import numpy as np
 import pandas as pd  
 
-from constants import *
+from src.constants import *
 # from charting import plot_single, plot_multiple
 
 class Recession(object):

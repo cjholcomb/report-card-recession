@@ -155,11 +155,25 @@ RECESSION_YEARS = {
     '1990': ['1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'],
     '2001': ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007'],
     '2008': ['2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'],
-    'full': [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020] }
+    'full': [1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020] }
 
 #reader-friendly quarter designations for better charts
 QUARTERS =  {
-    1989.25: 'Q1 1990', 1989.5: 'Q2 1990', 1989.75: 'Q3 1990', 1990.0: 'Q4 1990',
+    1975.25: 'Q1 1975', 1975.5: 'Q2 1975', 1975.75: 'Q3 1975', 1976.0: 'Q4 1975', 
+    1976.25: 'Q1 1976', 1976.5: 'Q2 1976', 1976.75: 'Q3 1976', 1977.0: 'Q4 1976', 
+    1977.25: 'Q1 1977', 1977.5: 'Q2 1977', 1977.75: 'Q3 1977', 1978.0: 'Q4 1977', 
+    1978.25: 'Q1 1978', 1978.5: 'Q2 1978', 1978.75: 'Q3 1978', 1979.0: 'Q4 1978',
+    1979.25: 'Q1 1979', 1979.5: 'Q2 1979', 1979.75: 'Q3 1979', 1980.0: 'Q4 1979',
+    1980.25: 'Q1 1980', 1980.5: 'Q2 1980', 1980.75: 'Q3 1980', 1981.0: 'Q4 1980',
+    1981.25: 'Q1 1981', 1981.5: 'Q2 1981', 1981.75: 'Q3 1981', 1982.0: 'Q4 1981',
+    1982.25: 'Q1 1982', 1982.5: 'Q2 1982', 1982.75: 'Q3 1982', 1983.0: 'Q4 1982', 
+    1983.25: 'Q1 1983', 1983.5: 'Q2 1983', 1983.75: 'Q3 1983', 1984.0: 'Q4 1983', 
+    1984.25: 'Q1 1984', 1984.5: 'Q2 1984', 1984.75: 'Q3 1984', 1985.0: 'Q4 1984', 
+    1985.25: 'Q1 1985', 1985.5: 'Q2 1985', 1985.75: 'Q3 1985', 1986.0: 'Q4 1985', 
+    1986.25: 'Q1 1986', 1986.5: 'Q2 1986', 1986.75: 'Q3 1986', 1987.0: 'Q4 1986', 
+    1987.25: 'Q1 1987', 1987.5: 'Q2 1987', 1987.75: 'Q3 1987', 1988.0: 'Q4 1987', 
+    1988.25: 'Q1 1988', 1988.5: 'Q2 1988', 1988.75: 'Q3 1988', 1989.0: 'Q4 1988',
+    1989.25: 'Q1 1989', 1989.5: 'Q2 1989', 1989.75: 'Q3 1989', 1990.0: 'Q4 1989',
     1990.25: 'Q1 1990', 1990.5: 'Q2 1990', 1990.75: 'Q3 1990', 1991.0: 'Q4 1990',
     1991.25: 'Q1 1991', 1991.5: 'Q2 1991', 1991.75: 'Q3 1991', 1992.0: 'Q4 1991',
     1992.25: 'Q1 1992', 1992.5: 'Q2 1992', 1992.75: 'Q3 1992', 1993.0: 'Q4 1992', 
@@ -219,21 +233,25 @@ industry_changes = {2007:
     'Added': [4522, 4523, 5173, 21112, 21113, 45221, 45231, 51225, 51731, 53228, 211120, 211130, 212230, 333914, 335220, 452210, 452311, 452319, 454110, 512250, 517311, 517312, 532281, 532282, 532283, 532284, 532289, 541713, 541714, 541715]}}
 
 #filepath function, used to derive correct loadpaths
-def filepath(variable = 'empl', dimension = 'area', charttype = 'basic', recession = 2001, filetype = 'json'):
+def filepath(variable = 'empl', dimension = 'area', charttype = 'basic', recession = 2001, filetype = 'json', adjustment = None):
     '''
     creates the filepath to load/save dataframes
 
         Parameters: 
             variable (str): indicates if the loaded/saved file will contain employment, wage, or firm data. Must be one of ['empl' (default), 'wage', 'firm']. 
-            dimension (str): indicates if the loaded/saved file will construct area or industry timelines. Must be one of ['area', 'industry'].
+            dimension (str): indicates if the loaded/saved file will construct area or industry timelines. Must be one of ['area' (default), 'industry'].
             charttype (str): indicates what type of timeline will be loaded/saved. Differentiation required for differing chart types in charting.py. Must be one of ['basic', 'target', 'proprtional'].
             recession (str): indicates the timeframe in question. Must be one of [2001, 2008, 'full']. 
             filetype (str): determines what type of file will be saved/loaded. Must be one of ['json', 'csv']. Use 'csv' for loading raw QCEW files.
+            adjustment (str): determines if timelines will be adjusted for inflation, seasonality, or both
 
         Returns:
             filepath (str): path to load appropriate file
     '''
     filename = DIM_ABBR[dimension] + "_" + variable + "_" + str(recession) + "." + filetype 
-    filepath = "data/timelines/" + charttype + "/" + dimension + "/" + variable + '/' +  filename 
+    if adjustment:
+        filepath = "data/timelines/adjusted/" + adjustment + '/' + charttype + "/" + dimension + "/" + variable + '/' +  filename 
+    else:
+        filepath = "data/timelines/" + charttype + "/" + dimension + "/" + variable + '/' +  filename 
     # print(filepath)
     return filepath

@@ -4,8 +4,8 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-from constants import *
-from classes import *
+from src.constants import *
+from src.classes import *
 
 sns.set_style('darkgrid')
 

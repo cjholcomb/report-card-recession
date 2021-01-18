@@ -19,25 +19,29 @@ def download_files(dimensions, years, override = False):
             year = str(year)
             #derive download urls and save paths
             if dimension == 'area':
-                if int(year) <1990:
+                if int(year) < 1990:
                     url = 'https://data.bls.gov/cew/data/files/' + year +'/csv/' +year + '_qtrly_naics10_totals.zip'
-                else:
+                    extractfolder = ''
+                    extractname = year + '.q1-q4 10 Total, all industries.csv'
+                elif int(year) == 2020:
                     url = 'https://data.bls.gov/cew/data/files/' + str(year) + '/csv/' + str(year) + '_qtrly_by_industry.zip'
-                if year == '2020':
                     extractfolder = year + '.q1-q2.by_industry/'
                     extractname = year + '.q1-q2 10 Total, all industries.csv'
                 else:
+                    url = 'https://data.bls.gov/cew/data/files/' + str(year) + '/csv/' + str(year) + '_qtrly_by_industry.zip'
                     extractfolder = year + '.q1-q4.by_industry/'
                     extractname = year + '.q1-q4 10 Total, all industries.csv'
             elif dimension == 'industry':
                 if int(year) < 1990:
-                    url = 'https://data.bls.gov/cew/data/files/' + year +'/sic/csv/sic_' + year+ '_qtrly_by_industry.zip'
-                else:
+                    url = 'https://data.bls.gov/cew/data/files/' + year +'/sic/csv/sic_' + year+ '_qtrly_by_area.zip'
+                    extractfolder = 'sic.' + year + '.q1-q4.by_area/'
+                    extractname = 'sic.' + year + '.q1-q4 US000 (U.S. TOTAL).csv'
+                elif year == 2020:
                     url = 'https://data.bls.gov/cew/data/files/' + str(year) + '/csv/' + str(year) + '_qtrly_by_area.zip'
-                if year == 2020:
                     extractfolder = year + '.q1-q2.by_area/'
                     extractname = year + '.q1-q2 US000 U.S. TOTAL.csv'
                 else:
+                    url = 'https://data.bls.gov/cew/data/files/' + str(year) + '/csv/' + str(year) + '_qtrly_by_area.zip'
                     extractfolder = year + '.q1-q4.by_area/'
                     extractname = year + '.q1-q4 US000 U.S. TOTAL.csv'   
             dimension_long = 'data/' + dimension + '_files/'
@@ -62,12 +66,14 @@ def download_files(dimensions, years, override = False):
             
             #extracts the file
             archive = zipfile.ZipFile(zipname)
+            # print(extractfolder+extractname)
             archive.extract(extractfolder + extractname, path = dimension_long)
             os.rename(dimension_long + extractfolder + extractname,  dimension_long + year + '.csv')
             print(dimension_long + year + '.csv unpacked')
             
             #cleans up
-            os.rmdir(dimension_long + extractfolder)
+            if not os.listdir(dimension_long + extractfolder):
+                os.rmdir(dimension_long + extractfolder)
             os.remove(dimension_long + year + '.zip')
             print('files cleaned up')
 

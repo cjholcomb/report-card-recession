@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
+import cpi
 
-from classes import *
+from src.constants import *
+from src.classes import *
 # from recessions import Recession
 # from industries import industry_titles
 
@@ -117,6 +119,22 @@ def basic_timeline(variable = 'empl', dimension = 'area', recession = 2001, save
             # "data/timelines/basic" + dim_abbr[dimension] + "_" + var_abbr[variable] + "_" + str(recession) + ".json"
         df.to_json(savepath)
     return df
+
+def deflated_timeline(dimension = 'area', variable = 'wage', recession = 2001, save = False):
+    if variable != 'wage':
+        pass
+    loadpath = filepath(variable = 'wage', dimension = dimension, charttype = 'basic', recession = recession, filetype = 'json')
+    df = pd.read_json(loadpath)
+    for col in df.columns[2:]:
+        newcol = col + '_i'
+        df[newcol] = cpi.inflate(df[col], int(float(col)- 0.25), 2000)
+        df.drop(columns = [col], inplace = True)
+        df.rename(columns = {newcol:float(col)}, inplace = True)
+    if save:
+        savepath = filepath(variable = 'wage', dimension = dimension, charttype = 'basic', recession = recession, filetype = 'json', adjustment = 'deflated')
+        df.to_json(savepath)
+    return df
+
 
 def target_timeline(variable = 'empl', dimension = 'area', recession = 2001, save = False, loadjson = False):
     '''
