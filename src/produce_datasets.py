@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import cpi
+from statistics import mean
 
 from src.constants import *
 from src.classes import *
@@ -109,7 +110,7 @@ def basic_timeline(variable = 'empl', dimension = 'area', recession = 2001, save
     df = df.pivot_table(columns = 'qtrid', values = VARNAME_LONG[variable], index = index, aggfunc = np.sum)
     df = df.reset_index()
     
-        #fill nans
+    #fill nans
     df = df.fillna(0)
     
     #export the data
@@ -135,7 +136,44 @@ def deflated_timeline(dimension = 'area', variable = 'wage', recession = 2001, s
         df.to_json(savepath)
     return df
 
+def smoothed_timeline(variable = 'empl', dimension = 'area', recession = 2001, save = False):
+    
+    #adds a year to the beginning of the normal timeline
+    years = RECESSION_YEARS[recession]
+    years.append(min(years) - 1)
+    years.sort()
+    df = import_all(years, dimension)
+    if dimension == 'area':
+        df = df[~df['area_fips'].str.contains("999")]
+        index = ['area_fips', 'area_title']
+    elif dimension == 'industry':
+        index = ['industry_code', 'industry_title']
+        #correct for changes in NAICS classification
+        df['industry_title'] = df['industry_code'].apply(lambda x: TITLE[x])
+    df = df.pivot_table(columns = 'qtrid', values = VARNAME_LONG[variable], index = index, aggfunc = np.sum)
+    df = df.reset_index()
+        
+    #fill nans
+    df = df.fillna(0)
 
+    #averages the previous 4 quarters
+    for col in df.columns[6:]:
+        newcol =  str(col) + '_s'
+        index = df.columns.get_loc(col)
+        interval = df.iloc[:,(index-3):index]
+        df[newcol] = interval.mean(axis=1)
+        df.drop(columns = [col], inplace = True)
+        df.rename(columns = {newcol:float(col)}, inplace = True)
+    
+    #removes the initial year
+    df.drop(columns = list(df.columns[2:6]), inplace = True)
+
+    #saves the json file
+    if save:
+        savepath = filepath(variable = 'wage', dimension = dimension, charttype = 'basic', recession = recession, filetype = 'json', adjustment = 'smooth')
+        df.to_json(savepath)
+    return df
+    
 def target_timeline(variable = 'empl', dimension = 'area', recession = 2001, save = False, loadjson = False):
     '''
     Produces a dataframe of the indicated recession timeline with derived target variables.
@@ -297,7 +335,7 @@ def proportional_timeline(variable = 'month3_emplvl', dimension = 'area', recess
         df.to_json(savepath) 
     return df
 
-def export_all(basic = False, target = False, proportion = False):
+def export_all(basic = False, target = False, proportion = False, adjustments = None):
     '''
     Exports json files of all timeline types, across all variables, dimensions, and recessions. Will overwrite any files already saved.
 

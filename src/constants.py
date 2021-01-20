@@ -243,7 +243,7 @@ def filepath(variable = 'empl', dimension = 'area', charttype = 'basic', recessi
             charttype (str): indicates what type of timeline will be loaded/saved. Differentiation required for differing chart types in charting.py. Must be one of ['basic', 'target', 'proprtional'].
             recession (str): indicates the timeframe in question. Must be one of [2001, 2008, 'full']. 
             filetype (str): determines what type of file will be saved/loaded. Must be one of ['json', 'csv']. Use 'csv' for loading raw QCEW files.
-            adjustment (str): determines if timelines will be adjusted for inflation, seasonality, or both
+            adjustment (str): determines if timelines will be adjusted for inflation ('deflated'), seasonality ('season'), or both ('full')
 
         Returns:
             filepath (str): path to load appropriate file
