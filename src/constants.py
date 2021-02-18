@@ -155,7 +155,7 @@ RECESSION_YEARS = {
     '1990': ['1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'],
     '2001': ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007'],
     '2008': ['2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'],
-    'full': [1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020] }
+    'full': [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020] }
 
 #reader-friendly quarter designations for better charts
 QUARTERS =  {
@@ -233,7 +233,7 @@ industry_changes = {2007:
     'Added': [4522, 4523, 5173, 21112, 21113, 45221, 45231, 51225, 51731, 53228, 211120, 211130, 212230, 333914, 335220, 452210, 452311, 452319, 454110, 512250, 517311, 517312, 532281, 532282, 532283, 532284, 532289, 541713, 541714, 541715]}}
 
 #filepath function, used to derive correct loadpaths
-def filepath(variable = 'empl', dimension = 'area', charttype = 'basic', recession = 2001, filetype = 'json', adjustment = None):
+def filepath(variable = 'empl', dimension = 'area', data = 'basic', recession = 2001, filetype = 'json', adjustment = False):
     '''
     creates the filepath to load/save dataframes
 
@@ -250,8 +250,8 @@ def filepath(variable = 'empl', dimension = 'area', charttype = 'basic', recessi
     '''
     filename = DIM_ABBR[dimension] + "_" + variable + "_" + str(recession) + "." + filetype 
     if adjustment:
-        filepath = "data/timelines/adjusted/" + adjustment + '/' + charttype + "/" + dimension + "/" + variable + '/' +  filename 
+        filepath = "data/timelines/adjusted/" + data + "/" + dimension + "/" + variable + '/' +  filename 
     else:
-        filepath = "data/timelines/" + charttype + "/" + dimension + "/" + variable + '/' +  filename 
+        filepath = "data/timelines/" + data + "/" + dimension + "/" + variable + '/' +  filename 
     # print(filepath)
     return filepath
